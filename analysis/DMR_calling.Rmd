@@ -1,0 +1,196 @@
+---
+title: "DMR_calling"
+author: "Reka Toth"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+
+## Setting folders and basic parameters
+
+```{r libraries, eval=T, message=FALSE, warning=FALSE, eval=FALSE}
+#Load library
+library(methrix)
+library(pheatmap)
+```
+
+```{r libraries_2, message=FALSE, warning=FALSE, eval=T}
+#Genome of your preference to work with
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+library(BiocManager)
+
+if(!requireNamespace("BSgenome.Hsapiens.UCSC.hg19")) {
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+}
+library(BSgenome.Hsapiens.UCSC.hg19) 
+```
+
+
+
+## Open dataset 
+```{r open_data, eval=T}
+
+meth <- readRDS(file.path("data/", "no_snps_methrix_2023.RDS"))
+
+
+meth@colData <- meth@colData[,-grep("X", colnames(meth@colData))]
+meth@colData$Cell.Type <- gsub(" \\(.*\\)", "", meth@colData$Cell.Type)
+meth@colData$Group <- as.character(meth@colData$Group)
+meth@colData["tumor01_C010_HSC_B370_BioID6515","Intra.individual.changes.patient.2"] <- "A"
+
+```
+
+
+## DMLTest
+
+First, we set up "dummy" variables to define the comparisons we would like to make. 
+
+1. CMP cells from patients vs. CMP cells from normal 
+
+
+```{r DML_prepare, eval=FALSE}
+#Set up the objects and the dummy variables 
+library(DSS)
+DML_tests <- list()
+meth@colData$CMP_tumor_normal <- ifelse(meth$AEL.subpopulation.vs..Healthy=="A", "CMP_tumor", 
+                                        ifelse(meth$AEL.subpopulation.vs..Healthy=="a", "CMP_normal", NA))
+
+meth@colData$HSC_tumor_normal <- ifelse(meth$AEL.subpopulation.vs..Healthy=="B", "HSC_tumor", 
+                                        ifelse(meth$AEL.subpopulation.vs..Healthy=="b", "HSC_normal", NA))
+
+meth@colData$MPP_tumor_normal <- ifelse(meth$AEL.subpopulation.vs..Healthy=="C", "MPP_tumor", 
+                                        ifelse(meth$AEL.subpopulation.vs..Healthy=="c", "MPP_normal", NA))
+
+
+bs_obj <- methrix::methrix2bsseq(meth)
+
+#subset_tumor <- meth[,-grep("NORMAL", meth@colData$Sample.Type)]
+bs_obj_tumor <- methrix::methrix2bsseq(meth[,-c(grep("NORMAL", meth@colData$Sample.Type),grep("BULK", meth@colData$Sample.Type))])
+
+
+#subset_normal <- meth[,grep("NORMAL", meth@colData$Sample.Type)]
+bs_obj_normal <- methrix::methrix2bsseq(meth[,grep("NORMAL", meth@colData$Sample.Type)])
+
+
+```
+
+```{r DML_test_CMP, eval=FALSE}
+
+
+DML_tests[["CMP_tumor_normal"]] = DMLtest(bs_obj, group1=rownames(meth@colData)[which(meth$CMP_tumor_normal=="CMP_tumor")], 
+                  group2=rownames(meth@colData)[which(meth$CMP_tumor_normal=="CMP_normal")], smoothing = TRUE)
+
+
+DML_tests[["CMP_tumor"]] = DMLtest(bs_obj_tumor, group1=rownames(bs_obj_tumor@colData)[which(!is.na(bs_obj_tumor$CMP_tumor_normal))], 
+                  group2=rownames(bs_obj_tumor@colData)[which(is.na(bs_obj_tumor$CMP_tumor_normal))], smoothing = TRUE)
+
+
+DML_tests[["CMP_normal"]] = DMLtest(bs_obj_normal, group1=rownames(bs_obj_normal@colData)[which(!is.na(bs_obj_normal$CMP_tumor_normal))], 
+                  group2=rownames(bs_obj_normal@colData)[which(is.na(bs_obj_normal$CMP_tumor_normal))], smoothing = TRUE)
+
+saveRDS(DML_tests, file=file.path("data", "DML_tests.RDS"))
+
+```
+
+2. HSC cells from patients vs. HSC cells from normal 
+
+```{r, DML_test_HSC, eval=FALSE}
+
+
+
+DML_tests[["HSC_tumor_normal"]] = DMLtest(bs_obj, group1=rownames(meth@colData)[which(meth$HSC_tumor_normal=="HSC_tumor")], 
+                  group2=rownames(meth@colData)[which(meth$HSC_tumor_normal=="HSC_normal")], smoothing = TRUE)
+
+
+
+DML_tests[["HSC_tumor"]] = DMLtest(bs_obj_tumor, group1=rownames(bs_obj_tumor@colData)[which(!is.na(bs_obj_tumor$HSC_tumor_normal))], 
+                  group2=rownames(bs_obj_tumor@colData)[which(is.na(bs_obj_tumor$HSC_tumor_normal))], smoothing = TRUE)
+
+
+DML_tests[["HSC_normal"]] = DMLtest(bs_obj_normal, group1=rownames(bs_obj_normal@colData)[which(!is.na(bs_obj_normal$HSC_tumor_normal))], 
+                  group2=rownames(bs_obj_normal@colData)[which(is.na(bs_obj_normal$HSC_tumor_normal))], smoothing = TRUE)
+
+saveRDS(DML_tests, file=file.path("data", "DML_tests.RDS"))
+
+```
+
+
+3. MPP cells from patients vs. MPP cells from normal 
+
+```{r DML_test_MPP, eval=FALSE}
+
+
+
+
+DML_tests[["MPP_tumor_normal"]] = DMLtest(bs_obj, group1=rownames(meth@colData)[which(meth$MPP_tumor_normal=="MPP_tumor")], 
+                  group2=rownames(meth@colData)[which(meth$MPP_tumor_normal=="MPP_normal")], smoothing = TRUE)
+
+
+DML_tests[["MPP_tumor"]] = DMLtest(bs_obj_tumor, group1=rownames(bs_obj_tumor@colData)[which(!is.na(bs_obj_tumor$MPP_tumor_normal))], 
+                  group2=rownames(bs_obj_tumor@colData)[which(is.na(bs_obj_tumor$MPP_tumor_normal))], smoothing = TRUE)
+
+
+DML_tests[["MPP_normal"]] = DMLtest(bs_obj_normal, group1=rownames(bs_obj_normal@colData)[which(!is.na(bs_obj_normal$MPP_tumor_normal))], 
+                  group2=rownames(bs_obj_normal@colData)[which(is.na(bs_obj_normal$MPP_tumor_normal))], smoothing = TRUE)
+
+
+saveRDS(DML_tests, file=file.path("data", "DML_tests.RDS"))
+```
+
+
+4. Tumor-normal comparison, adjusted for cell types 
+
+```{r eval=FALSE, include=FALSE}
+DMLfit <- list()
+meth@colData$Sample.Type <- as.character(meth@colData$Sample.Type)
+meth@colData$Sample.Type[!grepl("NORMAL", meth@colData$Sample.Type)] <- "TUMOR"
+
+#X = model.matrix(~Sample.Type + Cell.Type, as.data.frame(meth@colData))
+
+DMLfit[["Tumor_normal_adjusted"]]= DMLfit.multiFactor(bs_obj, design=as.data.frame(meth@colData), formula=~Sample.Type + Cell.Type)
+
+saveRDS(DMLfit, file=file.path("data", "DML_fits.RDS"))
+
+DMLtest <- list()
+DMLtest[["Tumor_normal_adjusted"]] <- list()
+DMLtest[["Tumor_normal_adjusted"]][["Tumor"]]  <- callDMR(DMLtest.multiFactor(DMLfit[["Tumor_normal_adjusted"]], coef="Sample.TypeTUMOR"), p.threshold=0.0001)
+
+DMLtest[["Tumor_normal_adjusted"]][["MPP"]]  <- callDMR(DMLtest.multiFactor(DMLfit[["Tumor_normal_adjusted"]], 
+                                                                              coef="Cell.Typesorted MPP"), p.threshold=0.0001)
+
+
+```
+
+5. Cell type, adjusted for patient
+
+```{r eval=FALSE, include=FALSE}
+meth@colData$Sample.Type <- as.character(meth@colData$Sample.Type)
+meth@colData$Sample.Type[!grepl("NORMAL", meth@colData$Sample.Type)] <- "TUMOR"
+subset <- meth[,-grep("Bulk", meth@colData$Cell.Type)]
+
+bs_obj <- methrix::methrix2bsseq(subset)
+#X = model.matrix(~Sample.Type + Cell.Type, as.data.frame(meth@colData))
+
+DMLfit[["Cell_type_in_tumor"]] = DMLfit.multiFactor(bs_obj, design=as.data.frame(subset@colData), formula=~ Cell.Type+Sample.Type)
+
+
+saveRDS(DMLfit, file=file.path("data", "DML_fits.RDS"))
+
+```
+
+```{r save, eval=FALSE}
+
+
+dmrs <- lapply(DML_tests, callDMR, p.threshold = 0.001)
+dmls <- lapply(DML_tests, callDML, p.threshold = 0.001)
+
+saveRDS(dmrs, file=file.path("data", "dmrs_single.RDS"))
+saveRDS(dmls, file=file.path("data", "dmls_single.RDS"))
+
+
+```
+

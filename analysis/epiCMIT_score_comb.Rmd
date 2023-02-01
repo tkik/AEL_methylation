@@ -1,0 +1,273 @@
+---
+title: "Epigenetic scores"
+author: "Reka_Toth"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+ # html_notebook: default
+  workflowr::wflow_html:
+    toc: false
+    code_folding: "hide"
+#output: workflowr::wflow_html:
+editor_options:
+  chunk_output_type: console
+---
+
+```{r include=F}
+knitr::opts_chunk$set(message = F, warning = F)
+```
+
+
+```{r libraries}
+library(methrix)
+library(RnBeads)
+library(RnBeads.hg19)
+library(ggsci)
+```
+
+```{r}
+replace.NA <-function(data,type.info,by = "mean"){
+  if(!"group" %in% colnames(type.info)) stop("type.info must have group column")
+  if(!"sample" %in% colnames(type.info)) stop("type.info must have a sample column")
+  
+  # Do we have NAs?
+  if(is.na(table(is.na(data))["TRUE"])){
+    message("No NAs were found")
+    return(data)
+  }
+  # get NAs index 
+  idx <- which(is.na(data) == TRUE,arr.ind=TRUE)
+  count <- table(rownames(idx))
+  message("======= Status Number of NA in probes ========")
+  message("--------------------- Summary------------------")
+  print(summary(as.numeric(count)))
+  message("\n----------- Probes with more nb of NAs -----------")
+  print(head(sort(count,decreasing = T)))
+  message("===============================================")
+  
+  idx <- cbind(idx, mean = NA, median = NA)
+  
+  # For each NA value calculate the mean for the same probe for the samples
+  # where it belongs
+  for(line in 1:nrow(idx)){
+    row <- idx[line,1]
+    col <- idx[line,2]
+    probe <- rownames(idx)[line]
+    sample <- colnames(data)[col]
+    group <- type.info[type.info$sample == sample,"group"]
+    samples.in.group <- type.info[type.info$group == group,]$sample
+    
+    # get the probe value for all samples in the same group 
+    aux <- data[rownames(data) %in% probe, colnames(data) %in% samples.in.group] 
+    
+    idx[line,3] <- mean(as.numeric(aux),na.rm = TRUE)
+    idx[line,4] <- median(as.numeric(aux),na.rm = TRUE)
+  }
+  # Step 2 replace
+  for(line in 1:nrow(idx)){
+    row <- idx[line,1]
+    col <- idx[line,2]
+    if(by == "mean"){
+      data[idx[line,1],idx[line,2]] <- idx[line,3]  
+    } else if(by == "median") { 
+      data[idx[line,1],idx[line,2]] <- idx[line,4]
+    }
+  }
+  return(data)
+}
+```
+
+```{r folders}
+###########libraries and functions#############
+
+
+DATA2 = ("P:/1_Aging_HSC//data/")
+RESULT = "./output/"
+CODE = "./code/"
+
+```
+
+
+```{r open_data}
+source(file.path(CODE, "epiTOC2.R"))
+meth <- readRDS(file.path("data", "no_snps_methrix_2023.RDS"))
+#meth2 <- readRDS(file.path(DATA2, "no_snps_methrix.RDS"))
+
+meth@colData["tumor01_C010_HSC_B370_BioID6515","Intra.individual.changes.patient.2"] <- "A"
+meth@colData["tumor01_C010_HSC_B370_BioID6515","Age"] <- "42.8474"
+meth@colData["tumor01_C010_HSC_B370_BioID6515","Sex"] <- "f"
+
+download.file("https://github.com/Duran-FerrerM/Pan-B-cell-methylome/raw/master/data/Estimate.epiCMIT.RData", destfile = "Estimate.epiCMIT.RData", method="libcurl")
+load("Estimate.epiCMIT.RData")
+file.remove("Estimate.epiCMIT.RData")
+
+```
+
+# epiCMIT score
+
+Publication: epiCMIT (https://doi.org/10.1038/s43018-020-00131-2)
+
+```{r}
+
+sites <- rnb.get.annotation(type="probes450")
+sites <- unlist(sites, use.names = F)
+epiCMIT_sites <- sites[rownames(Illumina.450k.hg19.example),]
+betas_epiCMIT <- get_region_summary(meth, regions = epiCMIT_sites)
+betas_epiCMIT2 <- get_region_summary(meth2, regions = epiCMIT_sites)
+
+betas_epiCMIT <- merge(betas_epiCMIT, betas_epiCMIT2, by=c("chr", "start","end", "n_overlap_CpGs", "rid"), all=F)
+
+rownames(betas_epiCMIT) <- names(epiCMIT_sites[betas_epiCMIT$rid,])
+
+betas_epiCMIT <- as.data.frame(betas_epiCMIT)
+rownames(betas_epiCMIT) <- names(epiCMIT_sites[betas_epiCMIT$rid,])
+names(epiCMIT.v2.Annot$epiCMIT.450K.EPIC.hg19) <- epiCMIT.v2.Annot$epiCMIT.450K.EPIC.hg19$Name
+epiCMIT.annot_2 <- as.data.frame(epiCMIT.v2.Annot$epiCMIT.450K.EPIC.hg19[rownames(betas_epiCMIT),])
+
+calc <- as.matrix(betas_epiCMIT[,-(1:5)])
+missing <- apply(calc, 2, function(x) sum(is.na(x)))>50
+calc <- calc[,-missing]
+
+res <- DNAm.to.epiCMIT(DNAm = as.data.frame(calc), DNAm.genome.assembly = "hg19", map.DNAm.to = "Illumina.450K.epiCMIT", CpGs.as.DNAm.rownames = T)
+epiCMIT.comb <- epiCMIT(res, export.results = F)
+
+coldata <- as.data.frame(colData(meth))
+coldata <- coldata[,c("Age", "Group", "X")]
+coldata2 <- as.data.frame(colData(meth2))
+coldata2 <- coldata2[,c("Age", "Group")]
+coldata2$X <- "HSC"
+coldata <- rbind(coldata, coldata2)
+
+coldata2 <- coldata[-missing,]
+coldata2$Group <- as.character(coldata2$Group)
+coldata2$Group[grep("NORMAL", rownames(coldata2))] <- "Normal"
+coldata2 <- cbind(coldata2, epiCMIT.comb$epiCMIT.scores)
+
+ggplot(coldata2)+geom_point(aes(epiCMIT, Age, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
+ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, Age, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
+ggplot(coldata2)+geom_point(aes(epiCMIT.hypo, Age, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
+ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, epiCMIT.hypo, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
+
+
+```
+
+#epiTOC
+
+Publication: (epiTOC2)[https://doi.org/10.1186/s13073-020-00752-3]
+
+Results:
+
+* tnsc: the estimated cumulative number of stem-cell divisions per stem-cell per year and per sample using the full epiTOC2 model.
+
+* tnsc2: the estimated cumulative number of stem-cell divisions per stem-cell per year and per sample using an approximation of epiTOC2 which assumes all epiTOC2 CpGs have beta-values exactly 0 in the fetal stage.
+
+* irS: this is returned only if the ages are provided, and gives the estimated average lifetime intrinsic rate of stem-cell division per sample, as derived from epiTOC2
+
+* irS2: as irS, but for the approximation.
+
+* irT: the median estimate over all irS values, yielding a median estimate for the intrinsic rate of stem-cell division for the tissue.
+
+* irT2: as irT, but for the approximation.
+
+* pcgtAge: this is the mitotic-score obtained using our previous epiTOC model.
+
+* hypoSC: the HypoClock score over the 678 solo-WCGWs
+
+
+```{r}
+load("code/dataETOC2.Rd")
+
+ETOC_sites <- c(rownames(dataETOC2.l$epiTOC2), dataETOC2.l$epiTOC, dataETOC2.l$`cm-solo-WCGW`)
+ETOC_sites <- unique(ETOC_sites)
+ETOC_sites <- sites[ETOC_sites,]
+
+
+
+betas_ETOC <- as.data.frame(get_region_summary(meth, regions = ETOC_sites))
+betas_ETOC2 <- as.data.frame(get_region_summary(meth2, regions = ETOC_sites))
+rownames(betas_ETOC) <- names(ETOC_sites[betas_ETOC$rid,])
+rownames(betas_ETOC2) <- names(ETOC_sites[betas_ETOC2$rid,])
+betas_ETOC <- merge(betas_ETOC, betas_ETOC2, by=c("chr", "start","end", "n_overlap_CpGs", "rid"), all=F)
+
+rownames(betas_ETOC) <- names(ETOC_sites[betas_ETOC$rid,])
+
+
+
+#betas_ETOC <- betas_ETOC[intersect(rownames(betas_ETOC), rownames(betas_ETOC2)),]
+#betas_ETOC2 <- betas_ETOC2[intersect(rownames(betas_ETOC), rownames(betas_ETOC2)),]
+
+#betas_ETOC <- cbind(betas_ETOC, betas_ETOC2[,-(1:5)])
+
+calc <- as.matrix(betas_ETOC[,-(1:5)])
+missing <- apply(calc, 2, function(x) sum(is.na(x)))>50
+calc <- calc[,-which(missing)]
+
+
+res2 <- epiTOC2(calc, ages.v = coldata$Age[-which(missing)])
+
+coldata2 <- coldata[-which(missing),]
+
+coldata2$hypoSC <- res2$hypoSC
+coldata2$pcgtAge <- res2$pcgtAge
+coldata2$tnsc <- res2$tnsc
+coldata2$tnsc2 <- res2$tnsc2
+coldata2$irS <- res2$irS
+coldata2$irS2 <- res2$irS2
+
+ggplot(coldata2)+geom_point(aes(hypoSC, Age, color=Group, shape=X), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(pcgtAge, Age, color=Group, shape=X), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(tnsc, Age, color=Group, shape=X), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(tnsc2, Age, color=Group, shape=X), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(irS, Age, color=Group, shape=X), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(irS2, Age, color=Group, shape=X), size=4)+theme_bw()
+
+
+
+```
+
+
+# Stemness score 
+
+```{r}
+
+
+load("data/pcbc-stemsig.p219.Rda")
+stem_sites <- sites[names(mm$w),]
+betas_stem <- as.data.frame(get_region_summary(meth, regions = stem_sites))
+betas_stem2 <- as.data.frame(get_region_summary(meth2, regions = stem_sites))
+betas_stem <- merge(betas_stem, betas_stem2, by=c("chr", "start","end", "n_overlap_CpGs", "rid"), all=T)
+
+rownames(betas_stem) <- names(stem_sites[betas_stem$rid,])
+
+
+missing <- names(mm$w)[!(names(mm$w) %in% rownames(betas_stem))] 
+
+beta2 <- data.frame(matrix(nrow = length(missing), ncol = ncol(betas_stem)))
+rownames(beta2) <- missing
+colnames(beta2) <- colnames(betas_stem)
+betas_stem <- rbind(betas_stem, beta2)
+betas_stem <- betas_stem[names(mm$w),]
+
+```
+
+```{r}
+
+type.info <- coldata
+type.info$group <- type.info$Group
+type.info$sample <- type.info$X 
+
+testset <- replace.NA(betas_stem[,-(1:5)], type.info, by="median") 
+testset <- apply(testset, 2, function(x) ifelse(is.na(x), mean(x, na.rm=T), x))
+w <- mm$w
+X <- testset[as.character(names(w)),]
+X <- as.matrix(X)
+ss <- t(w) %*% X
+ss <- ss - min(ss)
+ss <- ss / max(ss)
+ss <- as.data.frame(t(ss))
+colnames(ss) <- "mDNAsi"
+
+annotation <- merge(type.info, ss, by.x="row.names", by.y="row.names", sort=F)
+
+ggplot(annotation)+geom_point(aes(mDNAsi, Age, color=Group, shape=X), size=4)+theme_bw()
+```
+

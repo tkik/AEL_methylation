@@ -1,0 +1,106 @@
+---
+title: "Reading the samples"
+author: "Reka Toth"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load reference genome
+
+```{r libraries, message=FALSE, warning=FALSE}
+#Load library
+library(methrix)
+```
+
+```{r libraries_2, message=FALSE, warning=FALSE}
+#Genome of your preference to work with
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+library(BiocManager)
+
+if(!requireNamespace("BSgenome.Hsapiens.UCSC.hg19")) {
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+}
+library(BSgenome.Hsapiens.UCSC.hg19) 
+```
+
+
+```{r}
+#hg19_cpgs <- suppressWarnings(methrix::extract_CPGs(ref_genome = "BSgenome.Hsapiens.UCSC.hg19"))
+```
+
+## Sample annotation 
+Read in the provided sample annotation file. 
+
+```{r}
+
+meth <- readRDS("data/raw_methrix_2023.RDS")
+
+meth@colData$sample_names <- rownames(meth@colData)
+bdg_files <- meth@colData$sample_names[!grepl("(MEP|GMP|CB|BM|13TEP|077M|081M|90F)", meth@colData$sample_names)]
+
+meth <- meth[,bdg_files]
+
+
+sample_anno <- read.delim(file.path("data", "TWGBS_samples_AEL_final.txt"))
+
+
+rownames(sample_anno) <- sample_anno$ID
+
+bdg_files2 <- toupper(gsub("([[:alpha:]]+)_(C010_HSC_[[:alnum:]]+)", "\\2_\\1", bdg_files))
+sample_anno <- sample_anno[bdg_files2,]
+rownames(sample_anno) <- bdg_files
+
+
+
+sample_anno["tumor01_C010_HSC_B370_BioID6515","Group"] <- "AEL patient 2"
+sample_anno["tumor01_C010_HSC_B370_BioID6515","Patient.ID"] <- "C010_HSC_6515"
+sample_anno["tumor01_C010_HSC_B370_BioID6515","Sample.Type"] <- "Bulk"
+sample_anno["tumor01_C010_HSC_B370_BioID6515","Sample.Type"] <- "BULK"
+sample_anno["tumor01_C010_HSC_B370_BioID6515","X"] <- "BULK"
+sample_anno["tumor01_C010_HSC_B370_BioID6515","ID"] <- "C010_HSC_6515_BULK"
+sample_anno["tumor01_C010_HSC_B370_BioID6515","Processing.Date"] <- "30.01.2023"
+sample_anno["tumor01_C010_HSC_B370_BioID8561","Group"] <- "AEL patient 4"
+sample_anno["tumor01_C010_HSC_B370_BioID8561","Patient.ID"] <- "C010_HSC_8561"
+sample_anno["tumor01_C010_HSC_B370_BioID8561","Sample.Type"] <- "BULK"
+sample_anno["tumor01_C010_HSC_B370_BioID8561","X"] <- "BULK"
+sample_anno["tumor01_C010_HSC_B370_BioID8561","ID"] <- "C010_HSC_8561_BULK"
+sample_anno["tumor01_C010_HSC_B370_BioID8561","Processing.Date"] <- "30.01.2023"
+
+meth@colData <- DataFrame(sample_anno)
+
+```
+
+
+## Methrix report
+
+```{r}
+methrix::methrix_report(meth = meth, output_dir = "output/2023/", prefix="raw")
+```
+
+
+
+
+#Remove SNPs and save the result
+
+
+```{r remove_snps, echo=TRUE, message=TRUE, warning=FALSE, eval=F}
+
+meth <- methrix::subset_methrix(meth, contigs = paste0("chr", 1:22))
+meth <- methrix::remove_snps(meth)
+meth <- methrix::coverage_filter(meth, cov_thr = 5, prop_samples = 0.25)
+meth <- mask_methrix(meth, low_count = 2)
+saveRDS(meth, paste0("data/", "no_snps_methrix_2023.RDS"))
+
+```
+
+```{r new_report, eval=F, echo=TRUE, message=TRUE, warning=FALSE}
+
+methrix_report(meth, output_dir = "output/2023/" , recal_stats = T, prefix="filtered")
+
+```
+
+

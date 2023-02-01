@@ -1,0 +1,122 @@
+---
+title: "read_in"
+author: "Reka_Toth"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+ # html_notebook: default
+  workflowr::wflow_html:
+    toc: false
+    code_folding: "hide"
+#output: workflowr::wflow_html:
+editor_options:
+  chunk_output_type: console
+---
+
+##  
+
+```{r message=FALSE, warning=FALSE}
+
+##libraries
+
+
+library(DESeq2)
+library("GeneTonic")
+library("org.Hs.eg.db")
+library("AnnotationDbi")
+library(pcaExplorer)
+library(topGO)
+library(Glimma)
+library(dplyr)
+
+```
+
+```{r}
+
+####################with count data, using DESeq2
+
+####the count data is produced by stringtie, using prepDE.py
+##transcript level analysis is also possible
+
+
+gene_count_matrix <- read.csv( "data/gene_count_matrix.csv", row.names=1)
+
+
+    
+ anno <- data.frame(Patient.ID= gsub("X([[:digit:]]{4}).BM[[:punct:]]?(CMP|MPP|sorted.Bilk|latest)?_S[[:digit:]]+", "\\1",  colnames(gene_count_matrix)), 
+                    Group=gsub("X([[:digit:]]{4}).BM[[:punct:]]?(CMP|MPP|sorted.Bilk|latest)?_S[[:digit:]]+", "\\2",  colnames(gene_count_matrix)) %>% ifelse(. %in% c("CMP", "MPP"), ., "Bulk"), Cell.Type="BM", Age=NA)
+ 
+rownames(anno) <-  colnames(gene_count_matrix)
+
+rownames(gene_count_matrix) <- gsub("(ENSG[[:digit:]]*\\.[[:digit:]]*)(\\|.*)", "\\1", rownames(gene_count_matrix))
+  
+dds <- DESeqDataSetFromMatrix(gene_count_matrix, colData = anno, design = ~ Group, )
+#dds <- DESeq(dds)
+
+glimmaMDS(dds)
+
+vsd <- vst(dds, blind=FALSE)
+#plotPCA(vsd, intgroup=c("PatientID", "SampleType"))
+
+
+```
+
+## Read in and add the samples from the Aging HSC project 
+
+```{r}
+
+dds_aging <- readRDS( file = file.path("P:/1_Aging_HSC/data", "dds_full.RDS"))
+
+rownames(dds_aging) <- substr(rownames(dds_aging),1,15)
+dds_aging@colData$Batch <- "Aging"
+rownames(dds) <- substr(rownames(dds),1,15)
+dds@colData$Batch <- "AEL"
+dds <- dds[intersect(rownames(dds), rownames(dds_aging)),]
+dds_aging <- dds_aging[intersect(rownames(dds), rownames(dds_aging)),]
+
+dds_full <- SummarizedExperiment::cbind(dds, dds_aging)
+
+```
+
+
+
+
+
+```{r}
+
+anno_df <- data.frame(
+  ensembl = rownames(dds_full),
+  gene_id =   mapIds(org.Hs.eg.db,
+                            keys= rownames(dds_full),
+                            column="ENTREZID",
+                            keytype="ENSEMBL",
+                            multiVals="first"),
+  gene_name =  mapIds(org.Hs.eg.db,
+                            keys= rownames(dds_full),
+                            column="SYMBOL",
+                            keytype="ENSEMBL",
+                            multiVals="first"),
+  stringsAsFactors = FALSE,
+  row.names =  rownames(dds_full)
+)
+#dds <- list()
+#res <- list()
+
+bg_ids <- rownames(dds_full)[rowSums(counts(dds_full)) > 0]
+bg_symbols <- anno_df[bg_ids, "gene_name"]
+
+
+dds_full$Group2 <- as.character(dds_full$Group)
+dds_full$Group2[grep("HSC", dds_full$Group)] <- "Healthy HSC"
+dds_full$Group2[!grepl("Healthy", dds_full$Group2)] <- "AEL"
+dds_full$Group2 <- as.factor(dds_full$Group2)
+dds_full$Batch <- as.factor(dds_full$Batch)
+
+glimmaMDS(dds_full)
+
+design(dds_full) <- formula(~ Group2)
+
+dds_full <- DESeq(dds_full)
+res <- results(dds_full)
+
+```
+
