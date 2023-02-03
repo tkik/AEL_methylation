@@ -57,9 +57,11 @@ meth@colData <- meth@colData[,-grep("X", colnames(meth@colData))]
 meth@colData$Cell.Type <- gsub(" \\(.*\\)", "", meth@colData$Cell.Type)
 meth@colData$Group <- as.character(meth@colData$Group)
 meth@colData$Group[meth@colData$Group==""] <- "Normal"
+  meth@colData$Cell.Type[is.na(meth@colData$Cell.Type)] <- "Bulk patient sample"
 
-dmrs  <- readRDS(file=file.path("data_2023", "dmrs_single.RDS"))
-dmls <- readRDS(file=file.path("data_2023", "dmls_single.RDS"))
+
+dmrs  <- readRDS(file=file.path("data", "dmrs_single.RDS"))
+dmls <- readRDS(file=file.path("data", "dmls_single.RDS"))
 
 labels <- strsplit(names(dmrs), split="_")
 labels <- lapply(labels, function(x) ifelse(length(x)==3, paste0(x[2], " vs. ", x[3], " in ", x[1], " cells"), paste0(x[1], " vs. all in ", x[2])))
@@ -237,7 +239,7 @@ for (comp in cell_type_specific) {
   
 
   anno1 <- ggsci::pal_jama("default")(4)
-  anno2 <- ggsci::pal_jama("default")(7)[4:7]
+  anno2 <- ggsci::pal_jama("default")(7)[3:7]
   names(anno1) <- unique(meth@colData$Cell.Type)
   names(anno2) <- unique(as.character(meth@colData$Group))
   ha = HeatmapAnnotation(cell_type = as.data.frame(meth@colData)$Cell.Type,
@@ -277,7 +279,7 @@ for (comp in cell_type_specific) {
   
 
   anno1 <- ggsci::pal_jama("default")(4)
-  anno2 <- ggsci::pal_jama("default")(7)[4:7]
+  anno2 <- ggsci::pal_jama("default")(7)[3:7]
   names(anno1) <- unique(meth@colData$Cell.Type)
   names(anno2) <- unique(as.character(meth@colData$Group))
   ha = HeatmapAnnotation(cell_type = as.data.frame(meth@colData)$Cell.Type,
@@ -314,7 +316,7 @@ for (comp in names(dmrs)){
 peakAnnoList <- lapply(dmrs_split, annotatePeak, TxDb=txdb,
                        tssRegion=c(-3000, 3000), verbose=FALSE)
 for (i in 1:length(peakAnnoList)) {
-  write.table(as.data.frame(peakAnnoList[[i]]@anno), file=paste0("data", paste0(gsub(" ", "_", names(peakAnnoList)[[i]])), ".txt"), sep="\t", row.names=F, quote = F)
+  write.table(as.data.frame(peakAnnoList[[i]]@anno), file=paste0("data/", paste0(gsub(" ", "_", names(peakAnnoList)[[i]])), ".txt"), sep="\t", row.names=F, quote = F)
 
 }
 
@@ -389,6 +391,7 @@ comppthw <- compareCluster(geneCluster   = genes,
   cat("### Comparisons",
       comp,
       "\n")
+    if (!is.null(comppthw))
 print(dotplot(comppthw))
   cat("\n")
 }
@@ -421,6 +424,7 @@ comppthw <- compareCluster(geneCluster   = genes,
   cat("### Comparisons",
       comp,
       "\n")
+  if (!is.null(comppthw))
 print(dotplot(comppthw))
   cat("\n")
 }

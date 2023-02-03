@@ -1,5 +1,5 @@
 ---
-title: "Home"
+title: "scMeth_HSC"
 site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
@@ -8,4 +8,35 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+# Report on the initial analysis of cell type comparison in sorted normal and AEL patient cells 
+
+
+## Raw methylation data, QC
+
+
+Report on raw methylation results is here: [link](../output/raw_methrix_reports.html).
+
+
+## Filtered methylation data, QC
+
+
+Report on SNP and quality filtered methylation results is here: [link](../output/filtered_methrix_reports.html).
+
+
+
+## Visualization of the dataset
+
+
+Click on this [link](visualization.html) to see the report. 
+
+
+## Results of the differentially methylated region (DMR) calling
+
+
+Click on this [link](DMR_report.html) to see the report and annotation of DMR calling. 
+
+Click on this [link](homer_results.html) for TF motif analysis on DMRs. 
+
+## EpiCMIT analysis
+
+Click on this [link](epiCMIT_score_comb.html) for TF motif analysis on DMRs. 

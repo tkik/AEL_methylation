@@ -90,11 +90,13 @@ CODE = "./code/"
 ```{r open_data}
 source(file.path(CODE, "epiTOC2.R"))
 meth <- readRDS(file.path("data", "no_snps_methrix_2023.RDS"))
-#meth2 <- readRDS(file.path(DATA2, "no_snps_methrix.RDS"))
+meth2 <- readRDS(file.path(DATA2, "no_snps_methrix.RDS"))
 
-meth@colData["tumor01_C010_HSC_B370_BioID6515","Intra.individual.changes.patient.2"] <- "A"
-meth@colData["tumor01_C010_HSC_B370_BioID6515","Age"] <- "42.8474"
-meth@colData["tumor01_C010_HSC_B370_BioID6515","Sex"] <- "f"
+meth@colData <- meth@colData[,-grep("X", colnames(meth@colData))]
+meth@colData$Cell.Type <- gsub(" \\(.*\\)", "", meth@colData$Cell.Type)
+meth@colData$Group <- as.character(meth@colData$Group)
+meth@colData$Group[meth@colData$Group==""] <- "Normal"
+
 
 download.file("https://github.com/Duran-FerrerM/Pan-B-cell-methylome/raw/master/data/Estimate.epiCMIT.RData", destfile = "Estimate.epiCMIT.RData", method="libcurl")
 load("Estimate.epiCMIT.RData")
@@ -131,21 +133,24 @@ res <- DNAm.to.epiCMIT(DNAm = as.data.frame(calc), DNAm.genome.assembly = "hg19"
 epiCMIT.comb <- epiCMIT(res, export.results = F)
 
 coldata <- as.data.frame(colData(meth))
-coldata <- coldata[,c("Age", "Group", "X")]
+coldata$Cell.Type[is.na(coldata$Cell.Type)] <- "Bulk patient sample"
+coldata <- coldata[,c("Age", "Group", "Cell.Type")]
 coldata2 <- as.data.frame(colData(meth2))
 coldata2 <- coldata2[,c("Age", "Group")]
-coldata2$X <- "HSC"
+coldata2$Cell.Type <- "sorted HSC"
 coldata <- rbind(coldata, coldata2)
+coldata$Age <- as.numeric(coldata$Age)
+coldata$Age[is.na(coldata$Age)] <- 99
 
 coldata2 <- coldata[-missing,]
 coldata2$Group <- as.character(coldata2$Group)
 coldata2$Group[grep("NORMAL", rownames(coldata2))] <- "Normal"
 coldata2 <- cbind(coldata2, epiCMIT.comb$epiCMIT.scores)
 
-ggplot(coldata2)+geom_point(aes(epiCMIT, Age, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
-ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, Age, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
-ggplot(coldata2)+geom_point(aes(epiCMIT.hypo, Age, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
-ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, epiCMIT.hypo, color=Group, shape=X), size=4)+theme_bw()+scale_color_igv()
+ggplot(coldata2)+geom_point(aes(epiCMIT, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()
+ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()
+ggplot(coldata2)+geom_point(aes(epiCMIT.hypo, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()
+ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, epiCMIT.hypo, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()
 
 
 ```
@@ -213,12 +218,12 @@ coldata2$tnsc2 <- res2$tnsc2
 coldata2$irS <- res2$irS
 coldata2$irS2 <- res2$irS2
 
-ggplot(coldata2)+geom_point(aes(hypoSC, Age, color=Group, shape=X), size=4)+theme_bw()
-ggplot(coldata2)+geom_point(aes(pcgtAge, Age, color=Group, shape=X), size=4)+theme_bw()
-ggplot(coldata2)+geom_point(aes(tnsc, Age, color=Group, shape=X), size=4)+theme_bw()
-ggplot(coldata2)+geom_point(aes(tnsc2, Age, color=Group, shape=X), size=4)+theme_bw()
-ggplot(coldata2)+geom_point(aes(irS, Age, color=Group, shape=X), size=4)+theme_bw()
-ggplot(coldata2)+geom_point(aes(irS2, Age, color=Group, shape=X), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(hypoSC, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(pcgtAge, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(tnsc, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(tnsc2, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(irS, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()
+ggplot(coldata2)+geom_point(aes(irS2, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()
 
 
 
@@ -253,7 +258,7 @@ betas_stem <- betas_stem[names(mm$w),]
 
 type.info <- coldata
 type.info$group <- type.info$Group
-type.info$sample <- type.info$X 
+type.info$sample <- type.info$Cell.Type 
 
 testset <- replace.NA(betas_stem[,-(1:5)], type.info, by="median") 
 testset <- apply(testset, 2, function(x) ifelse(is.na(x), mean(x, na.rm=T), x))
@@ -268,6 +273,6 @@ colnames(ss) <- "mDNAsi"
 
 annotation <- merge(type.info, ss, by.x="row.names", by.y="row.names", sort=F)
 
-ggplot(annotation)+geom_point(aes(mDNAsi, Age, color=Group, shape=X), size=4)+theme_bw()
+ggplot(annotation)+geom_point(aes(mDNAsi, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()
 ```
 

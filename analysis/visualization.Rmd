@@ -1,0 +1,116 @@
+---
+title: "Visualization"
+author: "Reka_Toth"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+ # html_notebook: default
+  workflowr::wflow_html:
+    toc: false
+    code_folding: "hide"
+#output: workflowr::wflow_html:
+editor_options:
+  chunk_output_type: console
+---
+
+
+## Setting folders and basic parameters
+
+```{r libraries, message=FALSE, warning=FALSE}
+#Load library
+library(methrix)
+library(pheatmap)
+```
+
+```{r libraries_2, message=FALSE, warning=FALSE}
+#Genome of your preference to work with
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+library(BiocManager)
+
+if(!requireNamespace("BSgenome.Hsapiens.UCSC.hg19")) {
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+}
+library(BSgenome.Hsapiens.UCSC.hg19) 
+```
+
+## Open dataset 
+```{r}
+meth <- readRDS(file.path("data", "no_snps_methrix_2023.RDS"))
+meth@colData$Group[meth@colData$Group==""] <- "Normal"
+meth@colData$combined <- paste0(meth@colData$Group, "_", meth@colData$X)
+
+```
+
+# Visualization 
+
+
+## Coverage
+
+**Individual coverage**
+
+```{r}
+methrix::plot_coverage(m = meth, type = "dens")
+```
+
+
+**Tumor vs. normal**
+
+```{r}
+methrix::plot_coverage(m = meth, type = "dens", pheno = "Sample.Type", perGroup = TRUE)
+```
+
+## PCA
+
+### All samples 
+
+```{r}
+mpca <- methrix::methrix_pca(m = meth, top_var = 10000, n_pc = 2)
+
+methrix::plot_pca(mpca, m=meth, col_anno = "X", shape_anno = "Group")
+
+```
+
+### Patients only
+
+```{r message=FALSE, warning=FALSE}
+subset <- meth[,-grep("NORMAL", meth@colData$ID)]
+mpca <- methrix::methrix_pca(m = subset, top_var = 10000, n_pc = 2)
+methrix::plot_pca(mpca, m=subset, col_anno = "X", shape_anno = "Group")
+
+```
+
+### PCA on promoters
+
+```{r}
+library(annotatr)
+promoters = build_annotations(genome = 'hg19', annotations = "hg19_genes_promoters")
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+
+mpca <- methrix::methrix_pca(m= subset, top_var = 10000, ranges = promoters, n_pc = 2, do_plot = F)
+
+methrix::plot_pca(mpca, m=subset, col_anno = "X", shape_anno = "Group")
+
+```
+
+
+## Heatmap
+
+### All samples
+
+```{r}
+pheatmap::pheatmap(get_matrix(order_by_sd(meth)[1:20000,]))
+```
+
+### Patients only 
+
+```{r}
+pheatmap::pheatmap(get_matrix(order_by_sd(subset)[1:20000,]))
+```
+
+
+
