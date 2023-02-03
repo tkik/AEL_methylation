@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Reka_Toth" />
+
+
+<title>Epigenetic scores</title>
+
+<script src="site_libs/header-attrs-2.17/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">22_AEL</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Epigenetic scores</h1>
+<h4 class="author">Reka_Toth</h4>
+<h4 class="date">03 February, 2023</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-02-03
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>22_AEL/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20230201code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20230201)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20230201code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20230201)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreed2e0b8f9b74afd8e0c8e602eeca7368e957040dbtargetblankd2e0b8fa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/tkik/AEL_methylation/tree/d2e0b8f9b74afd8e0c8e602eeca7368e957040db" target="_blank">d2e0b8f</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreed2e0b8f9b74afd8e0c8e602eeca7368e957040dbtargetblankd2e0b8fa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/tkik/AEL_methylation/tree/d2e0b8f9b74afd8e0c8e602eeca7368e957040db" target="_blank">d2e0b8f</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    refdir/
+
+Untracked files:
+    Untracked:  analysis/01_read_in.Rmd
+    Untracked:  analysis/3_combine_meth_ge_mofa.Rmd
+    Untracked:  analysis/candidate_genes.Rmd
+    Untracked:  analysis/enhancer_gene_pairs.Rmd
+    Untracked:  analysis/epiCMIT_score.Rmd
+    Untracked:  analysis/homer_all.Rmd
+    Untracked:  analysis/homer_results_promoter.Rmd
+    Untracked:  analysis/inital_analysis.Rmd
+    Untracked:  analysis/prepare_homer.Rmd
+    Untracked:  analysis/test.Rmd
+    Untracked:  code/dataETOC2.Rd
+    Untracked:  code/epiTOC2.R
+    Untracked:  code/homer_analysis_2023_01.bash
+    Untracked:  code/region_annotation_function.R
+    Untracked:  code/seq2gene_func.R
+    Untracked:  data/CMP_vs._all_in_normal_down.txt
+    Untracked:  data/CMP_vs._all_in_normal_up.txt
+    Untracked:  data/CMP_vs._all_in_tumor_down.txt
+    Untracked:  data/CMP_vs._all_in_tumor_up.txt
+    Untracked:  data/DML_tests.RDS
+    Untracked:  data/HSC_vs._all_in_normal_down.txt
+    Untracked:  data/HSC_vs._all_in_normal_up.txt
+    Untracked:  data/HSC_vs._all_in_tumor_down.txt
+    Untracked:  data/HSC_vs._all_in_tumor_up.txt
+    Untracked:  data/MPP_vs._all_in_normal_down.txt
+    Untracked:  data/MPP_vs._all_in_normal_up.txt
+    Untracked:  data/MPP_vs._all_in_tumor_down.txt
+    Untracked:  data/MPP_vs._all_in_tumor_up.txt
+    Untracked:  data/deseq.RDS
+    Untracked:  data/dmls_single.RDS
+    Untracked:  data/dmr_beds/
+    Untracked:  data/dmr_beds_enhancer/
+    Untracked:  data/dmr_beds_promoter/
+    Untracked:  data/dmrs_single.RDS
+    Untracked:  data/gene_count_matrix.csv
+    Untracked:  data/homer_results_merged.RDS
+    Untracked:  data/mutations.txt
+    Untracked:  data/no_snps_methrix_2023.RDS
+    Untracked:  data/pcbc-stemsig.p219.Rda
+    Untracked:  data/raw_methrix_2023.RDS
+    Untracked:  data/samples_stringtie.txt
+    Untracked:  data/transcript_count_matrix.csv
+    Untracked:  data/tumor_vs._all_in_normal_down.txt
+    Untracked:  data/tumor_vs._all_in_normal_up.txt
+    Untracked:  data/tumor_vs._normal_in_CMP_cells_down.txt
+    Untracked:  data/tumor_vs._normal_in_CMP_cells_up.txt
+    Untracked:  data/tumor_vs._normal_in_HSC_cells_down.txt
+    Untracked:  data/tumor_vs._normal_in_HSC_cells_up.txt
+    Untracked:  data/tumor_vs._normal_in_MPP_cells_down.txt
+    Untracked:  data/tumor_vs._normal_in_MPP_cells_up.txt
+    Untracked:  dataCMP_vs._all_in_normal_down.txt
+    Untracked:  dataCMP_vs._all_in_normal_up.txt
+    Untracked:  dataCMP_vs._all_in_tumor_down.txt
+    Untracked:  dataCMP_vs._all_in_tumor_up.txt
+    Untracked:  dataHSC_vs._all_in_normal_down.txt
+    Untracked:  dataHSC_vs._all_in_normal_up.txt
+    Untracked:  dataHSC_vs._all_in_tumor_down.txt
+    Untracked:  dataHSC_vs._all_in_tumor_up.txt
+    Untracked:  dataMPP_vs._all_in_normal_down.txt
+    Untracked:  dataMPP_vs._all_in_normal_up.txt
+    Untracked:  dataMPP_vs._all_in_tumor_down.txt
+    Untracked:  dataMPP_vs._all_in_tumor_up.txt
+    Untracked:  datatumor_vs._normal_in_CMP_cells_down.txt
+    Untracked:  datatumor_vs._normal_in_CMP_cells_up.txt
+    Untracked:  datatumor_vs._normal_in_HSC_cells_down.txt
+    Untracked:  datatumor_vs._normal_in_HSC_cells_up.txt
+    Untracked:  datatumor_vs._normal_in_MPP_cells_down.txt
+    Untracked:  datatumor_vs._normal_in_MPP_cells_up.txt
+    Untracked:  output/MDS.html
+    Untracked:  output/MDS_files/
+    Untracked:  output/MDS_full.html
+    Untracked:  output/MDS_full_files/
+    Untracked:  output/TFBS.pdf
+    Untracked:  output/filtered/
+    Untracked:  output/filtered_MC_per_chr.tsv
+    Untracked:  output/filtered_contig_lens.tsv
+    Untracked:  output/filtered_global_MC_per_samp.tsv
+    Untracked:  output/filtered_methrix_reports.html
+    Untracked:  output/filtered_n_covered_by_all_samples.tsv
+    Untracked:  output/filtered_n_covered_per_chr.tsv
+    Untracked:  output/raw/
+    Untracked:  output/raw_MC_per_chr.tsv
+    Untracked:  output/raw_contig_lens.tsv
+    Untracked:  output/raw_global_MC_per_samp.tsv
+    Untracked:  output/raw_methrix_reports.html
+    Untracked:  output/raw_n_covered_by_all_samples.tsv
+    Untracked:  output/raw_n_covered_per_chr.tsv
+    Untracked:  output/res_enhancer/
+
+Unstaged changes:
+    Modified:   analysis/1_read_in_RNA_seq.Rmd
+    Modified:   analysis/DMR_calling.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/epiCMIT_score_comb.Rmd</code>)
+and HTML (<code>docs/epiCMIT_score_comb.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/d2e0b8f9b74afd8e0c8e602eeca7368e957040db/analysis/epiCMIT_score_comb.Rmd" target="_blank">d2e0b8f</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+<td>
+wflow_publish(files = c("analysis/epiCMIT_score_comb.Rmd",
+"analysis/DMR_report.Rmd",
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/f155798f94cf8ad49699b983765ab485e0d465eb/analysis/epiCMIT_score_comb.Rmd" target="_blank">f155798</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-01
+</td>
+<td>
+initial analysis
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(methrix)
+library(RnBeads)
+library(RnBeads.hg19)
+library(ggsci)</code></pre>
+<pre class="r"><code>replace.NA &lt;-function(data,type.info,by = &quot;mean&quot;){
+  if(!&quot;group&quot; %in% colnames(type.info)) stop(&quot;type.info must have group column&quot;)
+  if(!&quot;sample&quot; %in% colnames(type.info)) stop(&quot;type.info must have a sample column&quot;)
+  
+  # Do we have NAs?
+  if(is.na(table(is.na(data))[&quot;TRUE&quot;])){
+    message(&quot;No NAs were found&quot;)
+    return(data)
+  }
+  # get NAs index 
+  idx &lt;- which(is.na(data) == TRUE,arr.ind=TRUE)
+  count &lt;- table(rownames(idx))
+  message(&quot;======= Status Number of NA in probes ========&quot;)
+  message(&quot;--------------------- Summary------------------&quot;)
+  print(summary(as.numeric(count)))
+  message(&quot;\n----------- Probes with more nb of NAs -----------&quot;)
+  print(head(sort(count,decreasing = T)))
+  message(&quot;===============================================&quot;)
+  
+  idx &lt;- cbind(idx, mean = NA, median = NA)
+  
+  # For each NA value calculate the mean for the same probe for the samples
+  # where it belongs
+  for(line in 1:nrow(idx)){
+    row &lt;- idx[line,1]
+    col &lt;- idx[line,2]
+    probe &lt;- rownames(idx)[line]
+    sample &lt;- colnames(data)[col]
+    group &lt;- type.info[type.info$sample == sample,&quot;group&quot;]
+    samples.in.group &lt;- type.info[type.info$group == group,]$sample
+    
+    # get the probe value for all samples in the same group 
+    aux &lt;- data[rownames(data) %in% probe, colnames(data) %in% samples.in.group] 
+    
+    idx[line,3] &lt;- mean(as.numeric(aux),na.rm = TRUE)
+    idx[line,4] &lt;- median(as.numeric(aux),na.rm = TRUE)
+  }
+  # Step 2 replace
+  for(line in 1:nrow(idx)){
+    row &lt;- idx[line,1]
+    col &lt;- idx[line,2]
+    if(by == &quot;mean&quot;){
+      data[idx[line,1],idx[line,2]] &lt;- idx[line,3]  
+    } else if(by == &quot;median&quot;) { 
+      data[idx[line,1],idx[line,2]] &lt;- idx[line,4]
+    }
+  }
+  return(data)
+}</code></pre>
+<pre class="r"><code>###########libraries and functions#############
+
+
+DATA2 = (&quot;P:/1_Aging_HSC//data/&quot;)
+RESULT = &quot;./output/&quot;
+CODE = &quot;./code/&quot;</code></pre>
+<pre class="r"><code>source(file.path(CODE, &quot;epiTOC2.R&quot;))
+meth &lt;- readRDS(file.path(&quot;data&quot;, &quot;no_snps_methrix_2023.RDS&quot;))
+meth2 &lt;- readRDS(file.path(DATA2, &quot;no_snps_methrix.RDS&quot;))
+
+meth@colData &lt;- meth@colData[,-grep(&quot;X&quot;, colnames(meth@colData))]
+meth@colData$Cell.Type &lt;- gsub(&quot; \\(.*\\)&quot;, &quot;&quot;, meth@colData$Cell.Type)
+meth@colData$Group &lt;- as.character(meth@colData$Group)
+meth@colData$Group[meth@colData$Group==&quot;&quot;] &lt;- &quot;Normal&quot;
+
+
+download.file(&quot;https://github.com/Duran-FerrerM/Pan-B-cell-methylome/raw/master/data/Estimate.epiCMIT.RData&quot;, destfile = &quot;Estimate.epiCMIT.RData&quot;, method=&quot;libcurl&quot;)
+load(&quot;Estimate.epiCMIT.RData&quot;)
+file.remove(&quot;Estimate.epiCMIT.RData&quot;)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<div id="epicmit-score" class="section level1">
+<h1>epiCMIT score</h1>
+<p>Publication: epiCMIT (<a
+href="https://doi.org/10.1038/s43018-020-00131-2"
+class="uri">https://doi.org/10.1038/s43018-020-00131-2</a>)</p>
+<pre class="r"><code>sites &lt;- rnb.get.annotation(type=&quot;probes450&quot;)
+sites &lt;- unlist(sites, use.names = F)
+epiCMIT_sites &lt;- sites[rownames(Illumina.450k.hg19.example),]
+betas_epiCMIT &lt;- get_region_summary(meth, regions = epiCMIT_sites)
+betas_epiCMIT2 &lt;- get_region_summary(meth2, regions = epiCMIT_sites)
+
+betas_epiCMIT &lt;- merge(betas_epiCMIT, betas_epiCMIT2, by=c(&quot;chr&quot;, &quot;start&quot;,&quot;end&quot;, &quot;n_overlap_CpGs&quot;, &quot;rid&quot;), all=F)
+
+rownames(betas_epiCMIT) &lt;- names(epiCMIT_sites[betas_epiCMIT$rid,])
+
+betas_epiCMIT &lt;- as.data.frame(betas_epiCMIT)
+rownames(betas_epiCMIT) &lt;- names(epiCMIT_sites[betas_epiCMIT$rid,])
+names(epiCMIT.v2.Annot$epiCMIT.450K.EPIC.hg19) &lt;- epiCMIT.v2.Annot$epiCMIT.450K.EPIC.hg19$Name
+epiCMIT.annot_2 &lt;- as.data.frame(epiCMIT.v2.Annot$epiCMIT.450K.EPIC.hg19[rownames(betas_epiCMIT),])
+
+calc &lt;- as.matrix(betas_epiCMIT[,-(1:5)])
+missing &lt;- apply(calc, 2, function(x) sum(is.na(x)))&gt;50
+calc &lt;- calc[,-missing]
+
+res &lt;- DNAm.to.epiCMIT(DNAm = as.data.frame(calc), DNAm.genome.assembly = &quot;hg19&quot;, map.DNAm.to = &quot;Illumina.450K.epiCMIT&quot;, CpGs.as.DNAm.rownames = T)
+epiCMIT.comb &lt;- epiCMIT(res, export.results = F)
+
+coldata &lt;- as.data.frame(colData(meth))
+coldata$Cell.Type[is.na(coldata$Cell.Type)] &lt;- &quot;Bulk patient sample&quot;
+coldata &lt;- coldata[,c(&quot;Age&quot;, &quot;Group&quot;, &quot;Cell.Type&quot;)]
+coldata2 &lt;- as.data.frame(colData(meth2))
+coldata2 &lt;- coldata2[,c(&quot;Age&quot;, &quot;Group&quot;)]
+coldata2$Cell.Type &lt;- &quot;sorted HSC&quot;
+coldata &lt;- rbind(coldata, coldata2)
+coldata$Age &lt;- as.numeric(coldata$Age)
+coldata$Age[is.na(coldata$Age)] &lt;- 99
+
+coldata2 &lt;- coldata[-missing,]
+coldata2$Group &lt;- as.character(coldata2$Group)
+coldata2$Group[grep(&quot;NORMAL&quot;, rownames(coldata2))] &lt;- &quot;Normal&quot;
+coldata2 &lt;- cbind(coldata2, epiCMIT.comb$epiCMIT.scores)
+
+ggplot(coldata2)+geom_point(aes(epiCMIT, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(epiCMIT.hypo, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(epiCMIT.hyper, epiCMIT.hypo, color=Group, shape=Cell.Type), size=4)+theme_bw()+scale_color_igv()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>#epiTOC</p>
+<p>Publication: (epiTOC2)[<a
+href="https://doi.org/10.1186/s13073-020-00752-3"
+class="uri">https://doi.org/10.1186/s13073-020-00752-3</a>]</p>
+<p>Results:</p>
+<ul>
+<li><p>tnsc: the estimated cumulative number of stem-cell divisions per
+stem-cell per year and per sample using the full epiTOC2 model.</p></li>
+<li><p>tnsc2: the estimated cumulative number of stem-cell divisions per
+stem-cell per year and per sample using an approximation of epiTOC2
+which assumes all epiTOC2 CpGs have beta-values exactly 0 in the fetal
+stage.</p></li>
+<li><p>irS: this is returned only if the ages are provided, and gives
+the estimated average lifetime intrinsic rate of stem-cell division per
+sample, as derived from epiTOC2</p></li>
+<li><p>irS2: as irS, but for the approximation.</p></li>
+<li><p>irT: the median estimate over all irS values, yielding a median
+estimate for the intrinsic rate of stem-cell division for the
+tissue.</p></li>
+<li><p>irT2: as irT, but for the approximation.</p></li>
+<li><p>pcgtAge: this is the mitotic-score obtained using our previous
+epiTOC model.</p></li>
+<li><p>hypoSC: the HypoClock score over the 678 solo-WCGWs</p></li>
+</ul>
+<pre class="r"><code>load(&quot;code/dataETOC2.Rd&quot;)
+
+ETOC_sites &lt;- c(rownames(dataETOC2.l$epiTOC2), dataETOC2.l$epiTOC, dataETOC2.l$`cm-solo-WCGW`)
+ETOC_sites &lt;- unique(ETOC_sites)
+ETOC_sites &lt;- sites[ETOC_sites,]
+
+
+
+betas_ETOC &lt;- as.data.frame(get_region_summary(meth, regions = ETOC_sites))
+betas_ETOC2 &lt;- as.data.frame(get_region_summary(meth2, regions = ETOC_sites))
+rownames(betas_ETOC) &lt;- names(ETOC_sites[betas_ETOC$rid,])
+rownames(betas_ETOC2) &lt;- names(ETOC_sites[betas_ETOC2$rid,])
+betas_ETOC &lt;- merge(betas_ETOC, betas_ETOC2, by=c(&quot;chr&quot;, &quot;start&quot;,&quot;end&quot;, &quot;n_overlap_CpGs&quot;, &quot;rid&quot;), all=F)
+
+rownames(betas_ETOC) &lt;- names(ETOC_sites[betas_ETOC$rid,])
+
+
+
+#betas_ETOC &lt;- betas_ETOC[intersect(rownames(betas_ETOC), rownames(betas_ETOC2)),]
+#betas_ETOC2 &lt;- betas_ETOC2[intersect(rownames(betas_ETOC), rownames(betas_ETOC2)),]
+
+#betas_ETOC &lt;- cbind(betas_ETOC, betas_ETOC2[,-(1:5)])
+
+calc &lt;- as.matrix(betas_ETOC[,-(1:5)])
+missing &lt;- apply(calc, 2, function(x) sum(is.na(x)))&gt;50
+calc &lt;- calc[,-which(missing)]
+
+
+res2 &lt;- epiTOC2(calc, ages.v = coldata$Age[-which(missing)])</code></pre>
+<pre><code>[1] &quot;Number of represented epiTOC CpGs (max=385)=360&quot;
+[1] &quot;Number of represented epiTOC2 CpGs (max=163)=149&quot;
+[1] &quot;Number of represented solo-WCGWs (max=678)=610&quot;</code></pre>
+<pre class="r"><code>coldata2 &lt;- coldata[-which(missing),]
+
+coldata2$hypoSC &lt;- res2$hypoSC
+coldata2$pcgtAge &lt;- res2$pcgtAge
+coldata2$tnsc &lt;- res2$tnsc
+coldata2$tnsc2 &lt;- res2$tnsc2
+coldata2$irS &lt;- res2$irS
+coldata2$irS2 &lt;- res2$irS2
+
+ggplot(coldata2)+geom_point(aes(hypoSC, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(pcgtAge, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(tnsc, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(tnsc2, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(irS, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(coldata2)+geom_point(aes(irS2, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="stemness-score" class="section level1">
+<h1>Stemness score</h1>
+<pre class="r"><code>load(&quot;data/pcbc-stemsig.p219.Rda&quot;)
+stem_sites &lt;- sites[names(mm$w),]
+betas_stem &lt;- as.data.frame(get_region_summary(meth, regions = stem_sites))
+betas_stem2 &lt;- as.data.frame(get_region_summary(meth2, regions = stem_sites))
+betas_stem &lt;- merge(betas_stem, betas_stem2, by=c(&quot;chr&quot;, &quot;start&quot;,&quot;end&quot;, &quot;n_overlap_CpGs&quot;, &quot;rid&quot;), all=T)
+
+rownames(betas_stem) &lt;- names(stem_sites[betas_stem$rid,])
+
+
+missing &lt;- names(mm$w)[!(names(mm$w) %in% rownames(betas_stem))] 
+
+beta2 &lt;- data.frame(matrix(nrow = length(missing), ncol = ncol(betas_stem)))
+rownames(beta2) &lt;- missing
+colnames(beta2) &lt;- colnames(betas_stem)
+betas_stem &lt;- rbind(betas_stem, beta2)
+betas_stem &lt;- betas_stem[names(mm$w),]</code></pre>
+<pre class="r"><code>type.info &lt;- coldata
+type.info$group &lt;- type.info$Group
+type.info$sample &lt;- type.info$Cell.Type 
+
+testset &lt;- replace.NA(betas_stem[,-(1:5)], type.info, by=&quot;median&quot;) </code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   1.000   2.000   4.654   3.000  35.000 
+
+cg00812799 cg01378062 cg02463253 cg04844207 cg07397612 cg09373875 
+        35         35         35         35         35         35 </code></pre>
+<pre class="r"><code>testset &lt;- apply(testset, 2, function(x) ifelse(is.na(x), mean(x, na.rm=T), x))
+w &lt;- mm$w
+X &lt;- testset[as.character(names(w)),]
+X &lt;- as.matrix(X)
+ss &lt;- t(w) %*% X
+ss &lt;- ss - min(ss)
+ss &lt;- ss / max(ss)
+ss &lt;- as.data.frame(t(ss))
+colnames(ss) &lt;- &quot;mDNAsi&quot;
+
+annotation &lt;- merge(type.info, ss, by.x=&quot;row.names&quot;, by.y=&quot;row.names&quot;, sort=F)
+
+ggplot(annotation)+geom_point(aes(mDNAsi, Age, color=Group, shape=Cell.Type), size=4)+theme_bw()</code></pre>
+<p><img src="figure/epiCMIT_score_comb.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.2 (2022-10-31 ucrt)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 10 x64 (build 19042)
+
+Matrix products: default
+
+locale:
+[1] LC_COLLATE=English_United States.utf8 
+[2] LC_CTYPE=English_United States.utf8   
+[3] LC_MONETARY=English_United States.utf8
+[4] LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.utf8    
+
+attached base packages:
+ [1] parallel  grid      stats4    stats     graphics  grDevices utils    
+ [8] datasets  methods   base     
+
+other attached packages:
+ [1] ggsci_2.9                              
+ [2] RnBeads.hg19_1.29.0                    
+ [3] RnBeads_2.15.1                         
+ [4] plyr_1.8.7                             
+ [5] methylumi_2.43.0                       
+ [6] minfi_1.43.1                           
+ [7] bumphunter_1.39.0                      
+ [8] locfit_1.5-9.6                         
+ [9] iterators_1.0.14                       
+[10] foreach_1.5.2                          
+[11] Biostrings_2.65.6                      
+[12] XVector_0.37.1                         
+[13] FDb.InfiniumMethylation.hg19_2.2.0     
+[14] org.Hs.eg.db_3.16.0                    
+[15] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2
+[16] GenomicFeatures_1.49.7                 
+[17] AnnotationDbi_1.59.1                   
+[18] reshape2_1.4.4                         
+[19] scales_1.2.1                           
+[20] illuminaio_0.39.1                      
+[21] limma_3.53.10                          
+[22] gridExtra_2.3                          
+[23] gplots_3.1.3                           
+[24] ggplot2_3.3.6                          
+[25] fields_14.1                            
+[26] viridis_0.6.2                          
+[27] viridisLite_0.4.1                      
+[28] spam_2.9-1                             
+[29] ff_4.0.7                               
+[30] bit_4.0.4                              
+[31] cluster_2.1.4                          
+[32] MASS_7.3-58.1                          
+[33] methrix_1.12.0                         
+[34] SummarizedExperiment_1.27.3            
+[35] Biobase_2.57.1                         
+[36] GenomicRanges_1.49.0                   
+[37] GenomeInfoDb_1.33.7                    
+[38] IRanges_2.31.2                         
+[39] S4Vectors_0.35.4                       
+[40] BiocGenerics_0.43.4                    
+[41] MatrixGenerics_1.9.1                   
+[42] matrixStats_0.62.0                     
+[43] data.table_1.14.4                      
+[44] workflowr_1.7.0                        
+
+loaded via a namespace (and not attached):
+  [1] utf8_1.2.2                tidyselect_1.2.0         
+  [3] RSQLite_2.2.18            BiocParallel_1.31.12     
+  [5] munsell_0.5.0             codetools_0.2-18         
+  [7] preprocessCore_1.59.0     withr_2.5.0              
+  [9] colorspace_2.0-3          filelock_1.0.2           
+ [11] highr_0.9                 knitr_1.40               
+ [13] rstudioapi_0.14           labeling_0.4.2           
+ [15] git2r_0.30.1              GenomeInfoDbData_1.2.9   
+ [17] farver_2.1.1              bit64_4.0.5              
+ [19] rhdf5_2.41.1              rprojroot_2.0.3          
+ [21] vctrs_0.5.0               generics_0.1.3           
+ [23] xfun_0.34                 BiocFileCache_2.6.0      
+ [25] R6_2.5.1                  bitops_1.0-7             
+ [27] rhdf5filters_1.9.0        cachem_1.0.6             
+ [29] reshape_0.8.9             DelayedArray_0.23.2      
+ [31] assertthat_0.2.1          promises_1.2.0.1         
+ [33] BiocIO_1.8.0              gtable_0.3.1             
+ [35] processx_3.7.0            rlang_1.0.6              
+ [37] genefilter_1.79.0         splines_4.2.2            
+ [39] rtracklayer_1.57.0        GEOquery_2.66.0          
+ [41] BiocManager_1.30.19       yaml_2.3.6               
+ [43] httpuv_1.6.6              tools_4.2.2              
+ [45] nor1mix_1.3-0             ellipsis_0.3.2           
+ [47] jquerylib_0.1.4           RColorBrewer_1.1-3       
+ [49] siggenes_1.72.0           Rcpp_1.0.9               
+ [51] sparseMatrixStats_1.9.0   progress_1.2.2           
+ [53] zlibbioc_1.43.0           purrr_0.3.4              
+ [55] RCurl_1.98-1.9            ps_1.7.0                 
+ [57] prettyunits_1.1.1         openssl_2.0.4            
+ [59] fs_1.5.2                  magrittr_2.0.3           
+ [61] whisker_0.4               hms_1.1.2                
+ [63] evaluate_0.17             xtable_1.8-4             
+ [65] XML_3.99-0.12             mclust_6.0.0             
+ [67] compiler_4.2.2            biomaRt_2.54.0           
+ [69] tibble_3.1.8              maps_3.4.1               
+ [71] KernSmooth_2.23-20        crayon_1.5.2             
+ [73] htmltools_0.5.3           tzdb_0.3.0               
+ [75] later_1.3.0               tidyr_1.2.1              
+ [77] DBI_1.1.3                 dbplyr_2.2.1             
+ [79] rappdirs_0.3.3            readr_2.1.3              
+ [81] Matrix_1.5-1              cli_3.3.0                
+ [83] quadprog_1.5-8            dotCall64_1.0-2          
+ [85] pkgconfig_2.0.3           getPass_0.2-2            
+ [87] GenomicAlignments_1.33.1  xml2_1.3.3               
+ [89] annotate_1.76.0           bslib_0.4.1              
+ [91] rngtools_1.5.2            multtest_2.53.0          
+ [93] beanplot_1.3.1            doRNG_1.8.2              
+ [95] scrime_1.3.5              stringr_1.4.1            
+ [97] callr_3.7.3               digest_0.6.29            
+ [99] rmarkdown_2.17            base64_2.0.1             
+[101] DelayedMatrixStats_1.20.0 restfulr_0.0.15          
+[103] curl_4.3.3                Rsamtools_2.13.4         
+[105] gtools_3.9.3              rjson_0.2.21             
+[107] lifecycle_1.0.3           nlme_3.1-160             
+[109] jsonlite_1.8.3            Rhdf5lib_1.19.2          
+[111] askpass_1.1               BSgenome_1.66.0          
+[113] fansi_1.0.3               pillar_1.8.1             
+[115] lattice_0.20-45           KEGGREST_1.38.0          
+[117] fastmap_1.1.0             httr_1.4.4               
+[119] survival_3.4-0            glue_1.6.2               
+[121] png_0.1-7                 stringi_1.7.8            
+[123] sass_0.4.2                HDF5Array_1.25.2         
+[125] blob_1.2.3                caTools_1.18.2           
+[127] memoise_2.0.1             dplyr_1.0.10             </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
