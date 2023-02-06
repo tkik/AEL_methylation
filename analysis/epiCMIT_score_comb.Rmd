@@ -96,7 +96,7 @@ meth@colData <- meth@colData[,-grep("X", colnames(meth@colData))]
 meth@colData$Cell.Type <- gsub(" \\(.*\\)", "", meth@colData$Cell.Type)
 meth@colData$Group <- as.character(meth@colData$Group)
 meth@colData$Group[meth@colData$Group==""] <- "Normal"
-
+meth@colData$Age[meth@colData$Patient.ID=="C010_HSC_8561"] <- "55"
 
 download.file("https://github.com/Duran-FerrerM/Pan-B-cell-methylome/raw/master/data/Estimate.epiCMIT.RData", destfile = "Estimate.epiCMIT.RData", method="libcurl")
 load("Estimate.epiCMIT.RData")
