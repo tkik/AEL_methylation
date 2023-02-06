@@ -8,21 +8,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Report on the initial analysis of cell type comparison in sorted normal and AEL patient cells 
-
-
-## Raw methylation data, QC
-
-
-Report on raw methylation results is here: [link](../output/raw_methrix_reports.html).
-
-
-## Filtered methylation data, QC
-
-
-Report on SNP and quality filtered methylation results is here: [link](../output/filtered_methrix_reports.html).
-
-
 
 ## Visualization of the dataset
 
