@@ -25,3 +25,7 @@ Click on this [link](homer_results.html) for TF motif analysis on DMRs.
 ## EpiCMIT analysis
 
 Click on this [link](epiCMIT_score_comb.html) for TF motif analysis on DMRs. 
+
+
+## Gene expression of the methylation subgroups 
+[link](GE_meth_groups.html)
