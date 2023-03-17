@@ -1,0 +1,101 @@
+---
+title: "Reading the samples"
+author: "Reka Toth"
+date: "2019-11-26"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load reference genome
+
+```{r libraries, message=FALSE, warning=FALSE}
+#Load library
+library(methrix)
+```
+
+```{r libraries_2, message=FALSE, warning=FALSE}
+#Genome of your preference to work with
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+library(BiocManager)
+
+if(!requireNamespace("BSgenome.Hsapiens.UCSC.hg19")) {
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+}
+library(BSgenome.Hsapiens.UCSC.hg19) 
+```
+
+```{r directories, echo=TRUE, message=TRUE, warning=FALSE}
+
+###########libraries and functions#############
+if (grepl("Windows", Sys.getenv("OS"))){
+  PATH ="V:/"} else {
+    PATH ="/C010-projects/"}
+if (grepl("Windows", Sys.getenv("OS"))){
+  PATH_Y="N:/"} else {
+    PATH_Y="/C010-datasets/"}
+PATH_ICGC <- "/icgc/"
+
+
+DATA = paste0(PATH, "Reka/39_scMeth_HSC/data/")
+RESULT = paste0(PATH, "Reka/39_scMeth_HSC/output/")
+CALLS = paste0(PATH_ICGC, "analysis/C010/HSC/bdgs_2020_08_07_sorted/")
+
+```
+
+```{r}
+hg19_cpgs <- suppressWarnings(methrix::extract_CPGs(ref_genome = "BSgenome.Hsapiens.UCSC.hg19"))
+```
+
+## Sample annotation 
+Read in the provided sample annotation file. 
+
+```{r}
+
+#Example bedgraph files
+bdg_files <- list.files(
+  path = CALLS,
+  pattern = "*.bedGraph",
+  full.names = TRUE
+)
+bdg_files <- bdg_files[!grepl("(MEP|GMP|CB|BM|13TEP)", bdg_files)]
+
+sample_anno <- read.delim(file.path(DATA, "TWGBS_samples_AEL_final.txt"))
+rownames(sample_anno) <- sample_anno$ID
+names(bdg_files) <- gsub("/icgc/analysis/C010/HSC/bdgs_2020_08_07_sorted//", "", bdg_files)
+names(bdg_files) <- gsub("_merged.mdup.bedGraph_CpG.bedGraph", "", names(bdg_files))
+
+names(bdg_files) <- toupper(gsub("([[:alpha:]]+)_(C010_HSC_[[:alnum:]]+)", "\\2_\\1", names(bdg_files)))
+sample_anno <- sample_anno[names(bdg_files),]
+
+```
+
+## Read in 
+```{r read_in, eval=TRUE}
+meth <- methrix::read_bedgraphs(
+  files = bdg_files,
+  ref_cpgs = hg19_cpgs,
+  pipeline = "MethylDackel",
+  stranded = TRUE,
+  collapse_strands = TRUE, 
+  coldata = sample_anno,
+  vect = TRUE,
+  vect_batch_size = 4
+)
+
+saveRDS(meth, file = file.path(DATA, "raw_methrix.RDS"))
+```
+
+```{r, eval=F}
+meth <- readRDS(file.path(DATA, "raw_methrix.RDS"))
+```
+
+## Methrix report
+
+```{r}
+methrix::methrix_report(meth = meth, output_dir = RESULT, prefix="raw")
+```
+
+

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Reka Toth" />
+
+
+<title>Prepare data for homer</title>
+
+<script src="site_libs/header-attrs-2.17/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">22_AEL</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Prepare data for homer</h1>
+<h4 class="author">Reka Toth</h4>
+<h4 class="date">2019-10_31</h4>
+
+</div>
+
+
+<pre class="r"><code>library(methrix)
+library(bsseq)
+library(HDF5Array)
+library(plotly)
+library(ComplexHeatmap)
+library(methrix)
+library(DSS)
+library(annotatr)
+library(ggplot2)
+library(rtracklayer)
+library(limma)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(ChIPseeker)
+library(ggsci)
+library(regioneR)</code></pre>
+<div id="read-in-methrix-dataset" class="section level1">
+<h1>Read in methrix dataset</h1>
+<pre class="r"><code>Cellpaper &lt;- c(&quot;#313695&quot;,&quot;#4575b4&quot;, &quot;#74add1&quot;, &quot;#abd9e9&quot;,&quot;#e0f3f8&quot;,&quot;#ffffbf&quot;,&quot;#fee090&quot;,&quot;#fdae61&quot;,&quot;#f46d43&quot;,&quot;#d73027&quot;,&quot;#a50026&quot;)
+
+mypal = pal_nejm()(4)
+ann_colors = list(
+    sample_name = c(control = mypal[1], tumor = mypal[2]),
+    cell_type = c(MsCCSP = mypal[3], MsSPC = mypal[4])
+)
+
+
+meth &lt;- readRDS(file.path(&quot;data&quot;, &quot;no_snps_methrix_2023.RDS&quot;))
+meth@colData &lt;- meth@colData[,-grep(&quot;X&quot;, colnames(meth@colData))]
+meth@colData$Cell.Type &lt;- gsub(&quot; \\(.*\\)&quot;, &quot;&quot;, meth@colData$Cell.Type)
+meth@colData$Group &lt;- as.character(meth@colData$Group)
+meth@colData$Group[meth@colData$Group==&quot;&quot;] &lt;- &quot;Normal&quot;</code></pre>
+<pre class="r"><code>dmrs  &lt;- readRDS(file=file.path(&quot;data&quot;, &quot;dmrs_single.RDS&quot;))
+dmls &lt;- readRDS(file=file.path(&quot;data&quot;, &quot;dmls_single.RDS&quot;))
+
+labels &lt;- strsplit(names(dmrs), split=&quot;_&quot;)
+labels &lt;- lapply(labels, function(x) ifelse(length(x)==3, paste0(x[2], &quot; vs. &quot;, x[3], &quot; in &quot;, x[1], &quot; cells&quot;), paste0(x[1], &quot; vs. all in &quot;, x[2])))
+labels &lt;- unlist(labels)
+names(dmrs) &lt;- labels
+names(dmls) &lt;- labels
+
+
+
+gain &lt;- list()
+loss &lt;- list()
+
+
+for (comp in labels){
+
+  gain[[comp]] &lt;- dmrs[[comp]][dmrs[[comp]]$diff.Methy&lt;0,]
+  gain[[comp]]  &lt;- makeGRangesFromDataFrame(gain[[comp]] , keep.extra.columns = T)
+  genome(gain[[comp]] ) &lt;- rep(&quot;hg19&quot;, length(genome(gain[[comp]] )))
+
+
+  loss[[comp]] &lt;-  dmrs[[comp]][dmrs[[comp]]$diff.Methy&gt;0,]
+  loss[[comp]] &lt;- makeGRangesFromDataFrame(loss[[comp]], keep.extra.columns = T)
+  genome(loss[[comp]]) &lt;- rep(&quot;hg19&quot;, length(genome(loss[[comp]])))
+  
+}</code></pre>
+</div>
+<div id="all-regions" class="section level1">
+<h1>All regions</h1>
+<pre class="r"><code>require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene
+dir.create(&quot;data/dmr_beds&quot;)
+
+  #plots &lt;- list()
+for (comp in labels) {
+  cat(&#39;\n&#39;)
+  
+  cat(&quot;### Comparisons &quot;,
+      comp,
+      &quot;\n&quot;)
+ 
+  for (dataset in list(gain[[comp]], loss[[comp]])) {
+    
+    direction &lt;-
+      ifelse(all(mcols(dataset)$diff.Methy &lt; 0), &quot;gain&quot;, &quot;loss&quot;)
+    
+    
+  write.table(as.data.frame(dataset)[,c(1:3,5)] %&gt;% dplyr::select(seqnames, start, end, strand) %&gt;% mutate(strand=&quot;+&quot;), file=file.path(&quot;data&quot;, &quot;dmr_beds&quot;, paste0(gsub(&quot; &quot;, &quot;_&quot;, comp), &quot;_&quot;, direction, &quot;.bed&quot;)), row.names=T, col.names=F, sep=&quot;\t&quot;, quote=F) 
+    
+  }
+      
+
+}</code></pre>
+<div id="comparisons-tumor-vs.-normal-in-cmp-cells"
+class="section level3">
+<h3>Comparisons tumor vs. normal in CMP cells</h3>
+</div>
+<div id="comparisons-cmp-vs.-all-in-tumor" class="section level3">
+<h3>Comparisons CMP vs. all in tumor</h3>
+</div>
+<div id="comparisons-cmp-vs.-all-in-normal" class="section level3">
+<h3>Comparisons CMP vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-normal-in-hsc-cells"
+class="section level3">
+<h3>Comparisons tumor vs. normal in HSC cells</h3>
+</div>
+<div id="comparisons-hsc-vs.-all-in-tumor" class="section level3">
+<h3>Comparisons HSC vs. all in tumor</h3>
+</div>
+<div id="comparisons-hsc-vs.-all-in-normal" class="section level3">
+<h3>Comparisons HSC vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-normal-in-mpp-cells"
+class="section level3">
+<h3>Comparisons tumor vs. normal in MPP cells</h3>
+</div>
+<div id="comparisons-mpp-vs.-all-in-tumor" class="section level3">
+<h3>Comparisons MPP vs. all in tumor</h3>
+</div>
+<div id="comparisons-mpp-vs.-all-in-normal" class="section level3">
+<h3>Comparisons MPP vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-all-in-normal" class="section level3">
+<h3>Comparisons tumor vs. all in normal</h3>
+</div>
+</div>
+<div id="promoters" class="section level1">
+<h1>Promoters</h1>
+<pre class="r"><code>require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+annots = c(&#39;hg19_genes_promoters&#39;)
+annots_gr = build_annotations(genome = &#39;hg19&#39;, annotations = annots)
+
+dir.create(&quot;data/dmr_beds_promoter&quot;)
+  #plots &lt;- list()
+for (comp in labels) {
+  cat(&#39;\n&#39;)
+  
+  cat(&quot;### Comparisons &quot;,
+      comp,
+      &quot;\n&quot;)
+
+  for (dataset in list(gain[[comp]], loss[[comp]])) {
+
+    direction &lt;-
+      ifelse(all(mcols(dataset)$diff.Methy &lt; 0), &quot;gain&quot;, &quot;loss&quot;)
+    
+#identify the dmrs if they have an overlapping promoters
+    
+    promoters &lt;- subsetByOverlaps(annots_gr, dataset)
+    write.table(as.data.frame(promoters)[,c(1:3,5)] %&gt;% dplyr::select(seqnames, start, end, strand) %&gt;% mutate(strand=&quot;+&quot;), file=file.path(&quot;data&quot;, &quot;dmr_beds_promoter&quot;, paste0(gsub(&quot; &quot;, &quot;_&quot;, comp), &quot;_&quot;, direction, &quot;.bed&quot;)), row.names=T, col.names=F, sep=&quot;\t&quot;, quote=F) 
+  
+    
+  }
+      
+
+}</code></pre>
+<div id="comparisons-tumor-vs.-normal-in-cmp-cells-1"
+class="section level3">
+<h3>Comparisons tumor vs. normal in CMP cells</h3>
+</div>
+<div id="comparisons-cmp-vs.-all-in-tumor-1" class="section level3">
+<h3>Comparisons CMP vs. all in tumor</h3>
+</div>
+<div id="comparisons-cmp-vs.-all-in-normal-1" class="section level3">
+<h3>Comparisons CMP vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-normal-in-hsc-cells-1"
+class="section level3">
+<h3>Comparisons tumor vs. normal in HSC cells</h3>
+</div>
+<div id="comparisons-hsc-vs.-all-in-tumor-1" class="section level3">
+<h3>Comparisons HSC vs. all in tumor</h3>
+</div>
+<div id="comparisons-hsc-vs.-all-in-normal-1" class="section level3">
+<h3>Comparisons HSC vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-normal-in-mpp-cells-1"
+class="section level3">
+<h3>Comparisons tumor vs. normal in MPP cells</h3>
+</div>
+<div id="comparisons-mpp-vs.-all-in-tumor-1" class="section level3">
+<h3>Comparisons MPP vs. all in tumor</h3>
+</div>
+<div id="comparisons-mpp-vs.-all-in-normal-1" class="section level3">
+<h3>Comparisons MPP vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-all-in-normal-1" class="section level3">
+<h3>Comparisons tumor vs. all in normal</h3>
+</div>
+</div>
+<div id="enhancers" class="section level1">
+<h1>Enhancers</h1>
+<pre class="r"><code>annots = c(&#39;hg19_enhancers_fantom&#39;)
+annots_gr = build_annotations(genome = &#39;hg19&#39;, annotations = annots)
+dir.create(&quot;data/dmr_beds_enhancer&quot;)
+
+  #plots &lt;- list()
+for (comp in labels) {
+  cat(&#39;\n&#39;)
+  
+  cat(&quot;### Comparisons &quot;,
+      comp,
+      &quot;\n&quot;)
+  
+  for (dataset in list(gain[[comp]], loss[[comp]])) {
+
+    
+    direction &lt;-
+      ifelse(all(mcols(dataset)$diff.Methy &lt; 0), &quot;gain&quot;, &quot;loss&quot;)
+    
+#identify the enhancers if they have an overlapping dmr     
+    
+    enhancers &lt;- subsetByOverlaps(annots_gr, dataset)
+    write.table(as.data.frame(enhancers)[,c(1:3,5)] %&gt;% dplyr::select(seqnames, start, end, strand) %&gt;% mutate(strand=&quot;+&quot;), file=file.path(&quot;data&quot;, &quot;dmr_beds_enhancer&quot;, paste0(gsub(&quot; &quot;, &quot;_&quot;, comp), &quot;_&quot;, direction, &quot;.bed&quot;)), row.names=T, col.names=F, sep=&quot;\t&quot;, quote=F) 
+  
+  }
+      
+
+}</code></pre>
+<div id="comparisons-tumor-vs.-normal-in-cmp-cells-2"
+class="section level3">
+<h3>Comparisons tumor vs. normal in CMP cells</h3>
+</div>
+<div id="comparisons-cmp-vs.-all-in-tumor-2" class="section level3">
+<h3>Comparisons CMP vs. all in tumor</h3>
+</div>
+<div id="comparisons-cmp-vs.-all-in-normal-2" class="section level3">
+<h3>Comparisons CMP vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-normal-in-hsc-cells-2"
+class="section level3">
+<h3>Comparisons tumor vs. normal in HSC cells</h3>
+</div>
+<div id="comparisons-hsc-vs.-all-in-tumor-2" class="section level3">
+<h3>Comparisons HSC vs. all in tumor</h3>
+</div>
+<div id="comparisons-hsc-vs.-all-in-normal-2" class="section level3">
+<h3>Comparisons HSC vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-normal-in-mpp-cells-2"
+class="section level3">
+<h3>Comparisons tumor vs. normal in MPP cells</h3>
+</div>
+<div id="comparisons-mpp-vs.-all-in-tumor-2" class="section level3">
+<h3>Comparisons MPP vs. all in tumor</h3>
+</div>
+<div id="comparisons-mpp-vs.-all-in-normal-2" class="section level3">
+<h3>Comparisons MPP vs. all in normal</h3>
+</div>
+<div id="comparisons-tumor-vs.-all-in-normal-2" class="section level3">
+<h3>Comparisons tumor vs. all in normal</h3>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.2 (2022-10-31 ucrt)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 10 x64 (build 19042)
+
+Matrix products: default
+
+locale:
+[1] LC_COLLATE=English_United States.utf8 
+[2] LC_CTYPE=English_United States.utf8   
+[3] LC_MONETARY=English_United States.utf8
+[4] LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.utf8    
+
+attached base packages:
+ [1] parallel  grid      stats4    stats     graphics  grDevices utils    
+ [8] datasets  methods   base     
+
+other attached packages:
+ [1] BSgenome.Hsapiens.UCSC.hg19_1.4.3      
+ [2] BSgenome_1.66.0                        
+ [3] Biostrings_2.65.6                      
+ [4] XVector_0.37.1                         
+ [5] org.Hs.eg.db_3.16.0                    
+ [6] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2
+ [7] GenomicFeatures_1.49.7                 
+ [8] AnnotationDbi_1.59.1                   
+ [9] regioneR_1.30.0                        
+[10] ggsci_2.9                              
+[11] ChIPseeker_1.34.0                      
+[12] dplyr_1.0.10                           
+[13] kableExtra_1.3.4                       
+[14] knitr_1.40                             
+[15] limma_3.53.10                          
+[16] rtracklayer_1.57.0                     
+[17] annotatr_1.23.0                        
+[18] DSS_2.46.0                             
+[19] BiocParallel_1.31.12                   
+[20] ComplexHeatmap_2.14.0                  
+[21] plotly_4.10.0                          
+[22] ggplot2_3.3.6                          
+[23] HDF5Array_1.25.2                       
+[24] rhdf5_2.41.1                           
+[25] DelayedArray_0.23.2                    
+[26] Matrix_1.5-1                           
+[27] bsseq_1.34.0                           
+[28] methrix_1.12.0                         
+[29] SummarizedExperiment_1.27.3            
+[30] Biobase_2.57.1                         
+[31] GenomicRanges_1.49.0                   
+[32] GenomeInfoDb_1.33.7                    
+[33] IRanges_2.31.2                         
+[34] S4Vectors_0.35.4                       
+[35] BiocGenerics_0.43.4                    
+[36] MatrixGenerics_1.9.1                   
+[37] matrixStats_0.62.0                     
+[38] data.table_1.14.4                      
+
+loaded via a namespace (and not attached):
+  [1] utf8_1.2.2                    R.utils_2.12.1               
+  [3] tidyselect_1.2.0              RSQLite_2.2.18               
+  [5] htmlwidgets_1.5.4             scatterpie_0.1.8             
+  [7] munsell_0.5.0                 codetools_0.2-18             
+  [9] withr_2.5.0                   colorspace_2.0-3             
+ [11] GOSemSim_2.24.0               filelock_1.0.2               
+ [13] rstudioapi_0.14               DOSE_3.24.0                  
+ [15] git2r_0.30.1                  GenomeInfoDbData_1.2.9       
+ [17] polyclip_1.10-4               farver_2.1.1                 
+ [19] bit64_4.0.5                   rprojroot_2.0.3              
+ [21] treeio_1.22.0                 vctrs_0.5.0                  
+ [23] generics_0.1.3                xfun_0.34                    
+ [25] BiocFileCache_2.6.0           R6_2.5.1                     
+ [27] doParallel_1.0.17             graphlayouts_0.8.3           
+ [29] clue_0.3-62                   locfit_1.5-9.6               
+ [31] gridGraphics_0.5-1            fgsea_1.24.0                 
+ [33] bitops_1.0-7                  rhdf5filters_1.9.0           
+ [35] cachem_1.0.6                  assertthat_0.2.1             
+ [37] promises_1.2.0.1              BiocIO_1.8.0                 
+ [39] scales_1.2.1                  ggraph_2.1.0                 
+ [41] enrichplot_1.18.0             gtable_0.3.1                 
+ [43] tidygraph_1.2.2               workflowr_1.7.0              
+ [45] rlang_1.0.6                   systemfonts_1.0.4            
+ [47] GlobalOptions_0.1.2           splines_4.2.2                
+ [49] lazyeval_0.2.2                BiocManager_1.30.19          
+ [51] yaml_2.3.6                    reshape2_1.4.4               
+ [53] httpuv_1.6.6                  qvalue_2.30.0                
+ [55] tools_4.2.2                   ggplotify_0.1.0              
+ [57] gplots_3.1.3                  ellipsis_0.3.2               
+ [59] jquerylib_0.1.4               RColorBrewer_1.1-3           
+ [61] Rcpp_1.0.9                    plyr_1.8.7                   
+ [63] sparseMatrixStats_1.9.0       progress_1.2.2               
+ [65] zlibbioc_1.43.0               purrr_0.3.4                  
+ [67] RCurl_1.98-1.9                prettyunits_1.1.1            
+ [69] viridis_0.6.2                 GetoptLong_1.0.5             
+ [71] cowplot_1.1.1                 ggrepel_0.9.1                
+ [73] cluster_2.1.4                 fs_1.5.2                     
+ [75] magrittr_2.0.3                circlize_0.4.15              
+ [77] patchwork_1.1.2               hms_1.1.2                    
+ [79] mime_0.12                     evaluate_0.17                
+ [81] xtable_1.8-4                  HDO.db_0.99.1                
+ [83] XML_3.99-0.12                 gridExtra_2.3                
+ [85] shape_1.4.6                   compiler_4.2.2               
+ [87] biomaRt_2.54.0                tibble_3.1.8                 
+ [89] KernSmooth_2.23-20            shadowtext_0.1.2             
+ [91] crayon_1.5.2                  R.oo_1.25.0                  
+ [93] htmltools_0.5.3               ggfun_0.0.7                  
+ [95] later_1.3.0                   tzdb_0.3.0                   
+ [97] aplot_0.1.8                   tidyr_1.2.1                  
+ [99] DBI_1.1.3                     tweenr_2.0.2                 
+[101] dbplyr_2.2.1                  MASS_7.3-58.1                
+[103] rappdirs_0.3.3                boot_1.3-28                  
+[105] readr_2.1.3                   permute_0.9-7                
+[107] cli_3.3.0                     R.methodsS3_1.8.2            
+[109] igraph_1.3.5                  pkgconfig_2.0.3              
+[111] GenomicAlignments_1.33.1      xml2_1.3.3                   
+[113] foreach_1.5.2                 ggtree_3.6.0                 
+[115] svglite_2.1.0                 bslib_0.4.1                  
+[117] webshot_0.5.4                 rvest_1.0.3                  
+[119] yulab.utils_0.0.5             stringr_1.4.1                
+[121] digest_0.6.29                 fastmatch_1.1-3              
+[123] rmarkdown_2.17                tidytree_0.4.1               
+[125] DelayedMatrixStats_1.20.0     restfulr_0.0.15              
+[127] curl_4.3.3                    shiny_1.7.3                  
+[129] Rsamtools_2.13.4              gtools_3.9.3                 
+[131] rjson_0.2.21                  nlme_3.1-160                 
+[133] lifecycle_1.0.3               jsonlite_1.8.3               
+[135] Rhdf5lib_1.19.2               viridisLite_0.4.1            
+[137] fansi_1.0.3                   pillar_1.8.1                 
+[139] lattice_0.20-45               plotrix_3.8-2                
+[141] KEGGREST_1.38.0               fastmap_1.1.0                
+[143] httr_1.4.4                    GO.db_3.16.0                 
+[145] interactiveDisplayBase_1.36.0 glue_1.6.2                   
+[147] png_0.1-7                     iterators_1.0.14             
+[149] BiocVersion_3.16.0            bit_4.0.4                    
+[151] ggforce_0.4.1                 stringi_1.7.8                
+[153] sass_0.4.2                    blob_1.2.3                   
+[155] AnnotationHub_3.6.0           caTools_1.18.2               
+[157] memoise_2.0.1                 ape_5.6-2                    </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

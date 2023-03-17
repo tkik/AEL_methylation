@@ -45,17 +45,22 @@ gene_count_matrix <- read.csv( "data/gene_count_matrix.csv", row.names=1)
  anno <- data.frame(Patient.ID= gsub("X([[:digit:]]{4}).BM[[:punct:]]?(CMP|MPP|sorted.Bilk|latest)?_S[[:digit:]]+", "\\1",  colnames(gene_count_matrix)), 
                     Group=gsub("X([[:digit:]]{4}).BM[[:punct:]]?(CMP|MPP|sorted.Bilk|latest)?_S[[:digit:]]+", "\\2",  colnames(gene_count_matrix)) %>% ifelse(. %in% c("CMP", "MPP"), ., "Bulk"), Cell.Type="BM", Age=NA)
  
+anno$meth_group <- NA
+anno$meth_group[grep("8561|6515",rownames(anno))] <- "group1"
+anno$meth_group[-grep("8561|6515",rownames(anno))] <- "group2"
 rownames(anno) <-  colnames(gene_count_matrix)
 
 rownames(gene_count_matrix) <- gsub("(ENSG[[:digit:]]*\\.[[:digit:]]*)(\\|.*)", "\\1", rownames(gene_count_matrix))
   
 dds <- DESeqDataSetFromMatrix(gene_count_matrix, colData = anno, design = ~ Group, )
 #dds <- DESeq(dds)
-
-glimmaMDS(dds)
+#saveRDS(dds, "data/deseq.RDS")
+#glimmaMDS(dds, html = "output/MDS.html")
 
 vsd <- vst(dds, blind=FALSE)
 #plotPCA(vsd, intgroup=c("PatientID", "SampleType"))
+
+glimmaMDS(dds, html = "output/MDS.html")
 
 
 ```
@@ -74,6 +79,8 @@ dds <- dds[intersect(rownames(dds), rownames(dds_aging)),]
 dds_aging <- dds_aging[intersect(rownames(dds), rownames(dds_aging)),]
 
 dds_full <- SummarizedExperiment::cbind(dds, dds_aging)
+
+
 
 ```
 
@@ -111,12 +118,22 @@ dds_full$Group2[!grepl("Healthy", dds_full$Group2)] <- "AEL"
 dds_full$Group2 <- as.factor(dds_full$Group2)
 dds_full$Batch <- as.factor(dds_full$Batch)
 
-glimmaMDS(dds_full)
-
+#glimmaMDS(dds_full, html = "output/MDS_full.html")
 design(dds_full) <- formula(~ Group2)
 
 dds_full <- DESeq(dds_full)
 res <- results(dds_full)
+
+```
+
+```{r}
+
+vst <- getVarianceStabilizedData(dds_full)
+
+vst_cand <- vst[anno_df$ensembl[which(anno_df$gene_name %in% gene_names)],]
+pheatmap(vst_cand, scale = "row")
+
+
 
 ```
 
