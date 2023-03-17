@@ -13,7 +13,7 @@
 
 <title>scMeth_HSC</title>
 
-<script src="site_libs/header-attrs-2.17/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -302,7 +302,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-02-06
+<strong>Last updated:</strong> 2023-03-17
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -320,7 +320,7 @@ title="This is the local directory in which the code in this file was executed."
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
 analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version
-1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+1.7.0.4). The <em>Checks</em> tab describes the reproducibility checks
 that were applied when the results were created. The <em>Past
 versions</em> tab lists the development history.
 </p>
@@ -349,15 +349,15 @@ results.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtree45615aab91312c88f917c54f3754f68ec7e6e30etargetblank45615aaa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtree52d8617b3252726131a732fa0a7ee8eceac3caf0targetblank52d8617a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/tkik/AEL_methylation/tree/45615aab91312c88f917c54f3754f68ec7e6e30e" target="_blank">45615aa</a>
+<a href="https://github.com/tkik/AEL_methylation/tree/52d8617b3252726131a732fa0a7ee8eceac3caf0" target="_blank">52d8617</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtree45615aab91312c88f917c54f3754f68ec7e6e30etargetblank45615aaa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtree52d8617b3252726131a732fa0a7ee8eceac3caf0targetblank52d8617a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -367,7 +367,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/tkik/AEL_methylation/tree/45615aab91312c88f917c54f3754f68ec7e6e30e" target="_blank">45615aa</a>.
+<a href="https://github.com/tkik/AEL_methylation/tree/52d8617b3252726131a732fa0a7ee8eceac3caf0" target="_blank">52d8617</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -387,7 +387,6 @@ Ignored files:
     Ignored:    refdir/
 
 Untracked files:
-    Untracked:  analysis/01_read_in.Rmd
     Untracked:  analysis/3_combine_meth_ge_mofa.Rmd
     Untracked:  analysis/candidate_genes.Rmd
     Untracked:  analysis/enhancer_gene_pairs.Rmd
@@ -398,10 +397,6 @@ Untracked files:
     Untracked:  analysis/prepare_homer.Rmd
     Untracked:  analysis/test.Rmd
     Untracked:  code/dataETOC2.Rd
-    Untracked:  code/epiTOC2.R
-    Untracked:  code/homer_analysis_2023_01.bash
-    Untracked:  code/region_annotation_function.R
-    Untracked:  code/seq2gene_func.R
     Untracked:  data/CMP_vs._all_in_normal_down.txt
     Untracked:  data/CMP_vs._all_in_normal_up.txt
     Untracked:  data/CMP_vs._all_in_tumor_down.txt
@@ -415,6 +410,7 @@ Untracked files:
     Untracked:  data/MPP_vs._all_in_normal_up.txt
     Untracked:  data/MPP_vs._all_in_tumor_down.txt
     Untracked:  data/MPP_vs._all_in_tumor_up.txt
+    Untracked:  data/bigWigs_2023/
     Untracked:  data/deseq.RDS
     Untracked:  data/dmls_single.RDS
     Untracked:  data/dmr_beds/
@@ -422,6 +418,7 @@ Untracked files:
     Untracked:  data/dmr_beds_promoter/
     Untracked:  data/dmrs_single.RDS
     Untracked:  data/gene_count_matrix.csv
+    Untracked:  data/gene_expression_mat.txt
     Untracked:  data/homer_results_merged.RDS
     Untracked:  data/mutations.txt
     Untracked:  data/no_snps_methrix_2023.RDS
@@ -455,11 +452,6 @@ Untracked files:
     Untracked:  datatumor_vs._normal_in_HSC_cells_up.txt
     Untracked:  datatumor_vs._normal_in_MPP_cells_down.txt
     Untracked:  datatumor_vs._normal_in_MPP_cells_up.txt
-    Untracked:  output/MDS.html
-    Untracked:  output/MDS_files/
-    Untracked:  output/MDS_full.html
-    Untracked:  output/MDS_full_files/
-    Untracked:  output/TFBS.pdf
     Untracked:  output/filtered/
     Untracked:  output/filtered_MC_per_chr.tsv
     Untracked:  output/filtered_contig_lens.tsv
@@ -477,8 +469,8 @@ Untracked files:
     Untracked:  output/res_enhancer/
 
 Unstaged changes:
-    Modified:   analysis/1_read_in_RNA_seq.Rmd
     Modified:   analysis/DMR_calling.Rmd
+    Modified:   analysis/DMR_report.Rmd
 
 </code></pre>
 <p>
@@ -523,6 +515,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/52d8617b3252726131a732fa0a7ee8eceac3caf0/analysis/index.Rmd" target="_blank">52d8617</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-03-17
+</td>
+<td>
+wflow_publish("analysis/index.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/tkik/AEL_methylation/73128a7311a72791ae8ddda8ce434ec531c68afe/docs/index.html" target="_blank">73128a7</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -616,6 +642,11 @@ analysis on DMRs.</p>
 <h2>EpiCMIT analysis</h2>
 <p>Click on this <a href="epiCMIT_score_comb.html">link</a> for TF motif
 analysis on DMRs.</p>
+</div>
+<div id="gene-expression-of-the-methylation-subgroups"
+class="section level2">
+<h2>Gene expression of the methylation subgroups</h2>
+<p><a href="GE_meth_groups.html">link</a></p>
 </div>
 
 
