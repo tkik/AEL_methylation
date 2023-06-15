@@ -47,7 +47,7 @@ library(pheatmap)
 ```
 
 ```{r}
-get_aggrscores
+#get_aggrscores
 get_aggrscores_mod <-  function (res_enrich, res_de, annotation_obj, gtl = NULL, aggrfun = mean) 
 {
     if (!is.null(gtl)) {
@@ -188,7 +188,7 @@ anno_genes$gene_chr <- mapIds(TxDb.Hsapiens.UCSC.hg19.knownGene,
 
 ```
 
-```{r}
+```{r, fig.height=8, fig.width=10, results='asis'}
 
 gene_names <- c("CD34", "THY1", "PROM1", "EPO", "KITLG", "FLT3LG", "CSF2", "CSF1", "IL3", "IL6", "TPO", "MEIS1", "MEIS2")
 
@@ -211,10 +211,17 @@ res <- results(dds)
 
   glMDPlot(res, counts=assay(dds), anno = anno_genes, groups = dds$meth_group, main = "Meth_groups", status = as.numeric(res$padj<0.05), launch = F,  transform = F, html = "meth_groups",  folder = "/glimma-plots")
 
+  res %>%
+    as.data.frame() %>%
+    mutate(across(where(is.numeric), ~round(.x,digits=2))) %>%
+DT::datatable(., caption = "Gene expression results", filter = 'top', options = list(scrollX = '400px'))
+
+
+  
 ```
 
 
-```{r}
+```{r, results='asis'}
 
 bg_ids <- rownames(dds)[rowSums(counts(dds)) > 0]
 bg_symbols <- anno_genes[bg_ids, "GeneName"]
@@ -243,7 +250,7 @@ cat("### Methylation groups, enrichment analysis \n")
     
 cat("\n")  
 
-print(DT::datatable(res_enrich_simplified, caption = "Methylation groups", options = list(scrollX = '400px')))
+DT::datatable(res_enrich_simplified, caption = "Methylation groups", options = list(scrollX = '400px'))
 
 
 
