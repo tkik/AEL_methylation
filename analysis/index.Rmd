@@ -22,6 +22,8 @@ Click on this [link](DMR_report.html) to see the report and annotation of DMR ca
 
 Click on this [link](homer_results.html) for TF motif analysis on DMRs. 
 
+Click on this [link](DMR_report_AEL_subgroups.html) to see DNR report and motif enrichment for the identified methylation subgroups. 
+
 Click on this [link](DMR_report_illumina.html) to see the DMRs' behaviour in AML.
 
 Click on this [link](differential_AML.html) for the differences between AEL and AML.
@@ -35,7 +37,7 @@ Click on this [link](epiCMIT_score_comb.html) for TF motif analysis on DMRs.
 
 ## Gene expression of the methylation subgroups 
 
-[GE_meth_groups](GE_meth_groups.html)
+[GE_meth_groups](GE_meth_groups.html) - differential expression and master regulator analysis
 
 [Differential gene expression plots](../glimma-plots/meth_groups.html)
 

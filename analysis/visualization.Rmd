@@ -39,6 +39,12 @@ library(BSgenome.Hsapiens.UCSC.hg19)
 meth <- readRDS(file.path("data", "no_snps_methrix_2023.RDS"))
 meth@colData$Group[meth@colData$Group==""] <- "Normal"
 meth@colData$combined <- paste0(meth@colData$Group, "_", meth@colData$X)
+colnames(meth@colData)[colnames(meth@colData)=="X"] <- "Type"
+#meth@colData <- meth@colData[,-grep("X", colnames(meth@colData))]
+meth@colData$Cell.Type <- gsub(" \\(.*\\)", "", meth@colData$Cell.Type)
+meth@colData$Group <- as.character(meth@colData$Group)
+meth@colData$Group[meth@colData$Group==""] <- "Normal"
+  meth@colData$Cell.Type[is.na(meth@colData$Cell.Type)] <- "Bulk patient sample"
 
 ```
 
@@ -67,7 +73,7 @@ methrix::plot_coverage(m = meth, type = "dens", pheno = "Sample.Type", perGroup 
 ```{r}
 mpca <- methrix::methrix_pca(m = meth, top_var = 10000, n_pc = 2)
 
-methrix::plot_pca(mpca, m=meth, col_anno = "X", shape_anno = "Group")
+methrix::plot_pca(mpca, m=meth, col_anno = "Type", shape_anno = "Group")
 
 ```
 
@@ -76,7 +82,7 @@ methrix::plot_pca(mpca, m=meth, col_anno = "X", shape_anno = "Group")
 ```{r message=FALSE, warning=FALSE}
 subset <- meth[,-grep("NORMAL", meth@colData$ID)]
 mpca <- methrix::methrix_pca(m = subset, top_var = 10000, n_pc = 2)
-methrix::plot_pca(mpca, m=subset, col_anno = "X", shape_anno = "Group")
+methrix::plot_pca(mpca, m=subset, col_anno = "Type", shape_anno = "Group")
 
 ```
 
@@ -93,7 +99,7 @@ promoters = build_annotations(genome = 'hg19', annotations = "hg19_genes_promote
 
 mpca <- methrix::methrix_pca(m= subset, top_var = 10000, ranges = promoters, n_pc = 2, do_plot = F)
 
-methrix::plot_pca(mpca, m=subset, col_anno = "X", shape_anno = "Group")
+methrix::plot_pca(mpca, m=subset, col_anno = "Type", shape_anno = "Group")
 
 ```
 

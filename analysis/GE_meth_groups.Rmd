@@ -26,7 +26,7 @@ knitr::opts_chunk$set(message = F, warning = F)
 ```{r message=FALSE, warning=FALSE}
 
 ##libraries
-
+library(decoupleR)
 
 library(DESeq2)
 library("GeneTonic")
@@ -43,6 +43,16 @@ library(plotly)
 library(scales)
 library(clusterProfiler)
 library(pheatmap)
+library(dorothea)
+library(tidyverse)
+library(decoupleR)
+library(limma)
+library(ggrepel)
+
+
+source(file.path("code", "region_annotation_function.R"))
+source(file.path("code", "seq2gene_func.R"))
+source(file.path("code", "support_functions.R"))
 
 ```
 
@@ -130,8 +140,8 @@ gene_count_matrix <- read.csv( "data/gene_count_matrix.csv", row.names=1)
  
 rownames(anno) <-  colnames(gene_count_matrix)
 anno$meth_group <- NA
-anno$meth_group[grep("8561|6515",rownames(anno))] <- "group1"
-anno$meth_group[-grep("8561|6515",rownames(anno))] <- "group2"
+anno$meth_group[grep("8561|6515",rownames(anno))] <- "group2"
+anno$meth_group[-grep("8561|6515",rownames(anno))] <- "group1"
 
 
 rownames(gene_count_matrix) <- gsub("(ENSG[[:digit:]]*\\.[[:digit:]]*)(\\|.*)", "\\1", rownames(gene_count_matrix))
@@ -284,3 +294,100 @@ n_gs = 4)
 
 ```
 
+## Dorothea 
+
+```{r}
+  
+n_tfs <- 25
+
+top_genes_matrix <- sig_res %>% 
+    dplyr::filter(!is.na(GeneName)) %>% 
+    dplyr::distinct(GeneName, .keep_all = TRUE)  %>%
+    dplyr::select(GeneName, stat) %>% 
+    dplyr::filter(!is.na(stat)) %>% 
+    column_to_rownames(var = "GeneName") %>%
+    as.matrix()
+
+net <- get_collectri(organism='human', split_complexes=FALSE)
+
+
+contrast_acts <- run_ulm(mat = top_genes_matrix, net=net, .source='source', .target='target',.mor='mor', minsize = 5)
+
+
+f_contrast_acts <- contrast_acts %>%
+  mutate(rnk = NA)
+msk <- f_contrast_acts$score > 0
+f_contrast_acts[msk, 'rnk'] <- rank(-f_contrast_acts[msk, 'score'])
+f_contrast_acts[!msk, 'rnk'] <- rank(-abs(f_contrast_acts[!msk, 'score']))
+tfs <- f_contrast_acts %>%
+  arrange(rnk) %>%
+  head(n_tfs) %>%
+  pull(source)
+f_contrast_acts <- f_contrast_acts %>%
+  filter(source %in% tfs)
+
+# Plot
+ggplot(f_contrast_acts, aes(x = reorder(source, score), y = score)) + 
+    geom_bar(aes(fill = score), stat = "identity") +
+    scale_fill_gradient2(low = "darkblue", high = "indianred", 
+        mid = "whitesmoke", midpoint = 0) + 
+    theme_minimal() +
+    theme(axis.title = element_text(face = "bold", size = 12),
+        axis.text.x = 
+            element_text(angle = 45, hjust = 1, size =10, face= "bold"),
+        axis.text.y = element_text(size =10, face= "bold"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) +
+    xlab("Pathways")
+
+
+```
+
+
+## Genes significantly deregulated by candidate transcription factors
+
+
+```{r}
+
+for (tf in c("FOXO3", "ALK", "GATA2", "EPOR", "TAL1")){
+
+
+df <- net %>%
+filter(source == tf) %>%
+arrange(target) %>%
+mutate(ID = target, color = "3") %>%
+column_to_rownames('target')
+
+top_genes_matrix <- sig_res %>% 
+    dplyr::filter(!is.na(GeneName)) %>% 
+    dplyr::distinct(GeneName, .keep_all = TRUE)  %>%
+    dplyr::filter(!is.na(stat)) %>% 
+    column_to_rownames(var = "GeneName") %>%
+    as.matrix()
+
+inter <- sort(intersect(rownames(top_genes_matrix),rownames(df)))
+df <- df[inter, ]
+df<- cbind(df, top_genes_matrix[inter,]) %>%
+  mutate(across(c(log2FoldChange, padj), as.numeric))
+
+
+
+df <- df %>%
+  mutate(color = if_else(mor > 0 & stat > 0, '1', color)) %>%
+  mutate(color = if_else(mor > 0 & stat < 0, '2', color)) %>%
+  mutate(color = if_else(mor < 0 & stat > 0, '2', color)) %>%
+  mutate(color = if_else(mor < 0 & stat < 0, '1', color))
+
+p <- ggplot(df, aes(x = log2FoldChange, y = -log10(padj), color = color, size=abs(mor))) +
+  geom_point() +
+  scale_colour_manual(values = c("red","royalblue3","grey")) +
+  geom_label_repel(aes(label = ID, size=1)) + 
+  theme_minimal() +
+  theme(legend.position = "none") +
+  geom_vline(xintercept = 0, linetype = 'dotted') +
+  geom_hline(yintercept = 0, linetype = 'dotted') +
+  ggtitle(tf)
+print(p)
+}
+
+```
