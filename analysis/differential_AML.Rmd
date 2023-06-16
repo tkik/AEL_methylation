@@ -1,0 +1,175 @@
+---
+title: "Differential methlytion AML"
+author: "tkik"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+
+## Setting folders and basic parameters
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+#Load library
+library(methrix)
+library(pheatmap)
+library(DSS)
+library(ggplot2)
+library(plotly)
+library(RnBeads)
+library(sva)
+library(scales)
+```
+
+```{r libraries_2, message=FALSE, warning=FALSE}
+#Genome of your preference to work with
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+library(BiocManager)
+
+if(!requireNamespace("BSgenome.Hsapiens.UCSC.hg19")) {
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+}
+library(BSgenome.Hsapiens.UCSC.hg19) 
+library(annotatr)
+library(ComplexHeatmap)
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(clusterProfiler)
+
+
+```
+
+```{r directories, message=TRUE, warning=FALSE, include=FALSE}
+
+
+
+source(file.path("code", "region_annotation_function.R"))
+source(file.path("code", "seq2gene_func.R"))
+rnb.options(identifiers.column="ID")
+
+Cellpaper <- c("#313695","#4575b4", "#74add1", "#abd9e9","#e0f3f8","#ffffbf","#fee090","#fdae61","#f46d43","#d73027","#a50026")
+
+```
+
+```{r}
+meth <- readRDS(file.path("data", "no_snps_methrix_2023.RDS"))
+meth@colData <- meth@colData[,-grep("X", colnames(meth@colData))]
+meth@colData$Cell.Type <- gsub(" \\(.*\\)", "", meth@colData$Cell.Type)
+meth@colData$Group <- as.character(meth@colData$Group)
+meth@colData$Group[meth@colData$Group==""] <- "Normal"
+  meth@colData$Cell.Type[is.na(meth@colData$Cell.Type)] <- "Bulk patient sample"
+
+
+dmrs  <- readRDS(file=file.path("data", "dmrs_single.RDS"))
+dmls <- readRDS(file=file.path("data", "dmls_single.RDS"))
+
+labels <- strsplit(names(dmrs), split="_")
+labels <- lapply(labels, function(x) ifelse(length(x)==3, paste0(x[2], " vs. ", x[3], " in ", x[1], " cells"), paste0(x[1], " vs. all in ", x[2])))
+labels <- unlist(labels)
+names(dmrs) <- labels
+names(dmls) <- labels
+
+#illumina <- readRDS("data/processed_rnbset_GSE63409.RDS")
+#illumina@pheno$ID <- gsub("+", "plus", illumina@pheno$ID, fixed = T)
+#illumina@pheno$ID <- gsub("([[:digit:]])-", "\\1minus", illumina@pheno$ID )
+#illumina@pheno$ID <- gsub("-", ".", illumina@pheno$ID, fixed = T)
+#saveRDS(illumina, "data/processed_rnbset_GSE63409.RDS")
+
+illumina <- readRDS("data/processed_rnbset_GSE63409.RDS")
+
+illumina_anno <- RnBeads::annotation(illumina)
+
+meth2 <- subset_methrix(meth, regions = makeGRangesFromDataFrame(illumina_anno))
+
+
+colnames(illumina_anno)[c(1,2,4)] <- c("chr", "start", "strand")
+ illumina_anno$strand <- "*"
+ coldata <- pheno(illumina)
+ rownames(coldata) <- coldata$ID
+ illumina_methrix <- methrix:::create_methrix(beta_mat = meth(illumina), cov_mat = ceiling(meth(illumina)), cpg_loci = data.table(illumina_anno[,c("chr", "start", "strand")]),
+is_hdf5 = FALSE, genome_name = "hg19", col_data = pheno(illumina))
+ meth2 <- remove_uncovered(meth2)
+ sds <- rowSds(as.matrix(methrix::get_matrix(meth2)))
+ meth2 <- meth2[which(!is.na(sds)),]
+ meth2 <- meth2[order(sds[!is.na(sds)], decreasing = T)[1:30000],]
+ 
+ 
+ overlapping <- meth2@elementMetadata
+ overlapping$end <- overlapping$start+1
+illumina_methrix <- subset_methrix(illumina_methrix, makeGRangesFromDataFrame(overlapping))
+ 
+```
+
+
+```{r}
+
+illumina_methrix@elementMetadata$chr <- as.character(illumina_methrix@elementMetadata$chr)
+illumina_methrix@elementMetadata$start <- as.numeric(illumina_methrix@elementMetadata$start)
+illumina_methrix@elementMetadata$strand <- factor(illumina_methrix@elementMetadata$strand, levels = c("+", "-", "*"))
+
+plot_anno <- as.data.frame(meth@colData)[,c("Sample.Type", "Cell.Type", "Group")]
+plot_anno$Sample.Type2 <- ifelse(plot_anno$Sample.Type=="NORMAL", "normal", "AEL")
+plot_anno$Cell.Type <- gsub("sorted ", "", plot_anno$Cell.Type)
+plot_anno$origin <- "Seq"
+#plot_anno$origin[plot_anno$Sample.Type2!="normal"] <- NA
+meth2@colData <- DataFrame(plot_anno[,c("Cell.Type", "Sample.Type2","Group",  "origin")])
+
+
+
+plot_anno_illumina <- as.data.frame(illumina_methrix@colData)
+plot_anno_illumina <- plot_anno_illumina[,c("phenotype.ch1", "subject_status.ch1")]
+plot_anno_illumina$phenotype.ch1 <- gsub(" \\(.+\\)", "", plot_anno_illumina$phenotype.ch1)
+colnames(plot_anno_illumina) <- c("Cell.Type", "Sample.Type2")
+plot_anno_illumina$Group <- NA
+plot_anno_illumina$origin <- "ilumina"
+#plot_anno_illumina$origin[plot_anno_illumina$Sample.Type2!="normal"] <- NA
+illumina_methrix@colData <- DataFrame(plot_anno_illumina)
+
+
+illumina_methrix@elementMetadata <- illumina_methrix@elementMetadata[order(illumina_methrix@elementMetadata$chr),] 
+meth2@elementMetadata <- meth2@elementMetadata[order(meth2@elementMetadata$chr, meth2@elementMetadata$start),] 
+
+combined_data <- methrix::combine_methrix(illumina_methrix, meth2, by="col")
+
+
+
+mat <- methrix::get_matrix(combined_data)
+rownames(mat) <- paste0(combined_data@elementMetadata$chr, "_", combined_data@elementMetadata$start)
+
+design <- model.matrix(~0+Sample.Type2, data = combined_data@colData)
+contrast.matrix <- makeContrasts(Sample.Type2AEL-Sample.Type2normal, Sample.Type2AEL-Sample.Type2AML, Sample.Type2AML-Sample.Type2normal, levels=design)
+param <- SnowParam(workers = 8, type = "SOCK")
+
+mat <- mat[complete.cases(mat),]
+#mat2 <- mat[sample(1:nrow(mat), 20000),]
+set.seed(234)
+pheatmap(mat[sample(1:nrow(mat), 5000),], annotation_col = as.data.frame(combined_data@colData), show_rownames = F, show_colnames = F)
+mat_combat <- ComBat(as.matrix(mat), combined_data$origin)
+set.seed(234)
+pheatmap(mat_combat[sample(1:nrow(mat_combat), 5000),], annotation_col = as.data.frame(combined_data@colData), show_rownames = F, show_colnames = F)
+
+fit <- lmFit(mat_combat, design)
+fit2 <- contrasts.fit(fit, contrast.matrix)
+fit2 <- eBayes(fit2)
+
+res_AEL_normal <- topTable(fit2, coef=1, adjust="BH", number = 20000)
+pheatmap(mat_combat[rownames(res_AEL_normal[res_AEL_normal$adj.P.Val<0.05,]),], annotation_col = as.data.frame(combined_data@colData), show_rownames = F, show_colnames = F)
+
+res_AEL_AML <- topTable(fit2, coef=2, adjust="BH", number = 20000)
+pheatmap(mat_combat[rownames(res_AEL_AML[res_AEL_AML$adj.P.Val<0.05,]),], annotation_col = as.data.frame(combined_data@colData), show_rownames = F, show_colnames = F)
+
+
+```
+
+```{r, eval=F}
+
+sig_mat <- mat[intersect(rownames(res1[res1$adj.P.Val<0.0001 & abs(res1$logFC)>0.5,]),rownames(results@.Data[results@.Data[,1]!=0,])),  ]
+
+
+  pheatmap::pheatmap(sig_mat, annotation_col = as.data.frame(combined_data@colData), colorRampPalette(Cellpaper, space = "rgb")(10), main = comp, show_rownames = FALSE, show_colnames = F)
+
+```
+

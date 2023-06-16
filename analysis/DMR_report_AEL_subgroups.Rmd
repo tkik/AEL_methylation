@@ -1,0 +1,404 @@
+---
+title: "DMR report"
+author: "Reka_Toth"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+
+## Setting folders and basic parameters
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+#Load library
+library(methrix)
+library(pheatmap)
+library(DSS)
+library(ggplot2)
+library(plotly)
+library(scales)
+```
+
+```{r libraries_2, message=FALSE, warning=FALSE}
+#Genome of your preference to work with
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+library(BiocManager)
+
+if(!requireNamespace("BSgenome.Hsapiens.UCSC.hg19")) {
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg19")
+}
+library(BSgenome.Hsapiens.UCSC.hg19) 
+library(annotatr)
+library(ComplexHeatmap)
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(clusterProfiler)
+
+
+```
+
+```{r directories, message=TRUE, warning=FALSE, include=FALSE}
+
+
+
+source(file.path("code", "region_annotation_function.R"))
+source(file.path("code", "seq2gene_func.R"))
+
+Cellpaper <- c("#313695","#4575b4", "#74add1", "#abd9e9","#e0f3f8","#ffffbf","#fee090","#fdae61","#f46d43","#d73027","#a50026")
+
+```
+
+```{r}
+meth <- readRDS(file.path("data", "no_snps_methrix_2023.RDS"))
+meth@colData <- meth@colData[,-grep("X", colnames(meth@colData))]
+meth@colData$Cell.Type <- gsub(" \\(.*\\)", "", meth@colData$Cell.Type)
+meth@colData$Group <- as.character(meth@colData$Group)
+meth@colData$Group[meth@colData$Group==""] <- "Normal"
+  meth@colData$Cell.Type[is.na(meth@colData$Cell.Type)] <- "Bulk patient sample"
+
+
+dmrs  <- readRDS(file=file.path("data", "dmrs_single_15_06.RDS"))
+dmls <- readRDS(file=file.path("data", "dmls_single_15_06.RDS"))
+
+labels <- strsplit(names(dmrs), split="_")
+labels <- lapply(labels, function(x) ifelse(length(x)==3, paste0(x[2], " vs. ", x[3], " in ", x[1], " cells"), paste0(x[1], " vs. all in ", x[2])))
+labels <- unlist(labels)
+labels[labels=="AEL vs. all in gr1"] <- "AEL gr1 vs. AEL gr2"
+names(dmrs) <- labels
+names(dmls) <- labels
+
+dmrs[1:(which(labels=="AEL gr1 vs. AEL gr2")-1)] <- NULL
+labels <- labels[labels=="AEL gr1 vs. AEL gr2"]
+#dmls <- dmls[["AEL gr1 vs. AEL gr2"]]
+```
+
+Group 1 is patients 1-3 (4803 and 9390), group 2 is patients 2 and 4 (6515 and 8561).
+
+
+## Number and distribution of differentially methylated sites
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis', dev=c('png', 'pdf'), eval=TRUE}
+
+
+counts <- vector()
+for (comp in names(dmrs)){
+ counts <- c(counts, nrow(dmrs[[comp]][dmrs[[comp]]$diff.Methy<0,])) 
+ counts <- c(counts, nrow(dmrs[[comp]][dmrs[[comp]]$diff.Methy>0,])) 
+}
+length <- vector()
+for (comp in names(dmrs)){
+ length <- c(length, sum(dmrs[[comp]][dmrs[[comp]]$diff.Methy<0,"length"])) 
+ length <- c(length, sum(dmrs[[comp]][dmrs[[comp]]$diff.Methy>0,"length"])) 
+}
+
+
+data <- data.frame(Comp = rep(labels, each=2), Direction=rep(c("Gain in second", "Loss in second"), length(labels)), Count=log2(counts), Length=log2(length))
+
+   g <- ggplot(data=data)+geom_col(aes(x=Comp, y=Count, fill=Direction))+theme_bw()+theme(axis.title.x = element_blank(), axis.text.x = element_text(angle=45, hjust = 1))+scale_fill_brewer(palette = "Dark2")+scale_y_continuous(labels = comma)+ylab("Log2(Count)")
+ggplotly(g)
+   p <- ggplot(data=data)+geom_col(aes(x=Comp, y=Length, fill=Direction))+theme_bw()+theme(axis.title.x = element_blank(), axis.text.x = element_text(angle=45, hjust = 1))+scale_fill_brewer(palette = "Dark2")+scale_y_continuous(labels = comma)+ylab("Log2(Length)")
+ggplotly(p)
+   cat('\n') 
+
+```
+
+## Heatmap of DMRs{.tabset .tabset-fade}  
+
+
+```{r dmr_heatmaps, message=FALSE, warning=FALSE, results='asis', dev=c('png', 'pdf')}
+
+
+for (comp in names(dmrs)) {
+
+
+ mat1 <- as.data.frame(methrix::get_region_summary(meth, makeGRangesFromDataFrame(dmrs[[comp]][order(abs(dmrs[[comp]]$diff.Methy), decreasing = T)[1:min(nrow(dmrs[[comp]]), 20000)],])))
+
+  
+
+  plot_mat <- mat1[complete.cases(mat1),-(1:5)]
+  
+  #p <- pheatmap::pheatmap(plot_mat, annotation_col = as.data.frame(meth@colData)[,c("Sample.Type", "Cell.Type")], colorRampPalette(Cellpaper, space = "rgb")(10), main = comp, show_rownames = FALSE)
+   
+  cat("\n")
+  cat("### Comparisons",
+      comp,
+      "\n")
+  pheatmap::pheatmap(plot_mat, annotation_col = as.data.frame(meth@colData)[,c("Sample.Type", "Cell.Type")], colorRampPalette(Cellpaper, space = "rgb")(10), main = comp, show_rownames = FALSE)
+  
+   cat("\n")
+}
+
+
+```
+
+## Heatmap of DMRs overlap with promoters{.tabset .tabset-fade}  
+
+
+```{r dmr_heatmaps_2, results='asis',  message=FALSE, warning=FALSE,  dev=c('png', 'pdf'), eval=TRUE}
+
+
+annots = c('hg19_genes_promoters')
+annots_gr_orig = build_annotations(genome = 'hg19', annotations = annots)
+
+for (comp in names(dmrs)) {
+
+  regions <- makeGRangesFromDataFrame(dmrs[[comp]], keep.extra.columns = T)
+  
+  regions <- subsetByOverlaps(regions, annots_gr_orig)
+  
+  #regions[order(abs(regions$diff.Methy), decreasing = T)[1:min(length(regions), 20000)],]
+ mat1 <- as.data.frame(methrix::get_region_summary(meth, regions[order(abs(regions$diff.Methy), decreasing = T)[1:min(length(regions), 20000)],]))
+ 
+  
+  plot_mat <- mat1[complete.cases(mat1),-(1:5)]
+  
+  if (nrow(plot_mat)>1){
+ 
+  cat("\n")
+  cat("### Comparisons",
+      comp,
+      "\n")
+   pheatmap::pheatmap(plot_mat, annotation_col = as.data.frame(meth@colData)[,c("Sample.Type", "Cell.Type")], colorRampPalette(Cellpaper, space = "rgb")(10), main = comp, show_rownames = FALSE)
+   cat("\n")
+
+} else {
+  cat("No overlapping regions with promoters \n")
+}
+
+}
+
+```
+
+
+# Relation of DMRs with functional regions
+
+## Location of DMRs in relation to genes
+
+```{r message=FALSE, warning=FALSE, eval=TRUE}
+## loading packages
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+
+dmrs_split <- list()
+for (comp in names(dmrs)){
+  
+  dmrs_split[[paste0(comp, "_up")]] <- makeGRangesFromDataFrame(dmrs[[comp]][dmrs[[comp]]$diff.Methy<0,], keep.extra.columns = T)
+  dmrs_split[[paste0(comp, "_down")]] <- makeGRangesFromDataFrame(dmrs[[comp]][dmrs[[comp]]$diff.Methy>0,], keep.extra.columns = T)
+  
+}
+
+peakAnnoList <- lapply(dmrs_split, annotatePeak, TxDb=txdb,
+                       tssRegion=c(-3000, 3000), verbose=FALSE)
+for (i in 1:length(peakAnnoList)) {
+  write.table(as.data.frame(peakAnnoList[[i]]@anno), file=paste0("data/", paste0(gsub(" ", "_", names(peakAnnoList)[[i]])), ".txt"), sep="\t", row.names=F, quote = F)
+
+}
+
+plotAnnoBar(peakAnnoList)
+
+
+##Distance from TSS
+
+plotDistToTSS(peakAnnoList,
+              title="Distribution of DMRs\nrelative to TSS")
+
+```
+
+
+## Location of DMRS in relation to functional regions in H1hesc cells 
+
+Direction "up" means that the methylation is higher in the second group. "Down" means it is lower in the second group. 
+
+```{r fig.height=7, fig.width=9, message=FALSE, warning=FALSE, eval=TRUE}
+
+
+ annots = c('hg19_H1hesc-chromatin')
+  annots_gr_orig = build_annotations(genome = 'hg19', annotations = annots)
+ 
+   plots <-  region_annotation_function(dmrs = dmrs, annots_gr = annots_gr_orig, genome = "hg19")
+   
+   plots[[1]]
+   plots[[2]]
+    
+```
+
+## Location of DMRS in relation to functional regions in K562 cells 
+
+Direction "up" means that the methylation is higher in the second group. "Down" means it is lower in the second group. 
+
+```{r message=FALSE, warning=FALSE, fig.height=7, fig.width=9, eval=TRUE}
+
+
+ annots = c('hg19_K562-chromatin')
+  annots_gr_orig = build_annotations(genome = 'hg19', annotations = annots)
+ 
+   plots <-  region_annotation_function(dmrs = dmrs, annots_gr = annots_gr_orig, genome = "hg19")
+   
+   plots[[1]]
+   plots[[2]]
+    
+```
+
+## KEGG Pathway enrichment of the differentially methylated regions{.tabset .tabset-fade}  
+
+Direction "up" means that the methylation is higher in the second group. "Down" means it is lower in the second group. 
+
+```{r pathway_enrichment, results='asis',  message=TRUE, warning=FALSE,  dev=c('png', 'pdf'), eval=TRUE}
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+library(ReactomePA)
+library(clusterProfiler)
+
+for (comp in names(dmrs)){
+  dmr <- makeGRangesFromDataFrame(dmrs[[comp]], keep.extra.columns = T)
+
+genes <- lapply(list("Up"=dmr[dmr$diff.Methy<(-0.4),], "Down" =dmr[dmr$diff.Methy>0.4,]), seq2gene_func, tssRegion = c(-3000, 3000), flankDistance = 3000, TxDb=txdb)
+
+#names(genes) <- gsub(" ", "\n", names(genes))
+comppthw <- compareCluster(geneCluster   = genes,
+                         fun           = "enrichPathway",
+                         pvalueCutoff  = 0.05,
+                         pAdjustMethod = "BH")
+
+
+
+  cat("\n")
+  cat("### Comparisons",
+      comp,
+      "\n")
+    if (!is.null(comppthw))
+print(dotplot(comppthw))
+  cat("\n")
+}
+
+
+```
+
+## GO Pathway enrichment of the differentially methylated regions{.tabset .tabset-fade}  
+
+Direction "up" means that the methylation is higher in the second group. "Down" means it is lower in the second group. 
+
+```{r pathway_enrichment_GO, results='asis',  message=TRUE, warning=FALSE,  dev=c('png', 'pdf'), eval=TRUE}
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+library(ReactomePA)
+library(clusterProfiler)
+
+for (comp in names(dmrs)){
+  dmr <- makeGRangesFromDataFrame(dmrs[[comp]], keep.extra.columns = T)
+
+genes <- lapply(list("Up"=dmr[dmr$diff.Methy<(-0.4),], "Down" =dmr[dmr$diff.Methy>0.4,]), seq2gene_func, tssRegion = c(-3000, 3000), flankDistance = 3000, TxDb=txdb)
+
+#names(genes) <- gsub(" ", "\n", names(genes))
+comppthw <- compareCluster(geneCluster   = genes,
+                         fun           = "enrichGO",
+                         pvalueCutoff  = 0.05,
+                         pAdjustMethod = "BH", 
+                         OrgDb='org.Hs.eg.db')
+
+  cat("\n")
+  cat("### Comparisons",
+      comp,
+      "\n")
+  if (!is.null(comppthw))
+print(dotplot(comppthw))
+  cat("\n")
+}
+```
+
+
+```{r dose}
+library(DOSE)
+library(enrichplot)
+
+genes <- lapply(list("Up"=dmr[dmr$diff.Methy<(-0.4),], "Down" =dmr[dmr$diff.Methy>0.4,]), seq2gene_func, tssRegion = c(-3000, 3000), flankDistance = 3000, TxDb=txdb)
+
+
+for (dirs in names(genes)){
+  
+cat("Genes that are in group 1: ", dirs)
+  
+edo <- enrichDGN(genes[[dirs]])
+ mutate(edo, qscore = -log(p.adjust, base=10)) %>% 
+    barplot(x="qscore", showCategory=10)
+
+
+edox <- setReadable(edo, 'org.Hs.eg.db', 'ENTREZID')
+p1 <- cnetplot(edox)
+p1
+
+p2 <- heatplot(edox, showCategory=2)
+p2
+
+}
+
+```
+
+
+## Motif enrichment analysis 
+
+The differentially methylated regions are split into bins and each bin in analysed separately for motif enrichment. Using 10000 randomly selected regions from those that are highly altered.  
+
+```{r motif,  message=TRUE, warning=FALSE,  dev=c('png', 'pdf'), fig.height=8}
+library(monaLisa)
+library(JASPAR2020)
+library(TFBSTools)
+
+lmr <- dmrs$`AEL gr1 vs. AEL gr2`
+hist(
+  lmr$diff.Methy,
+  100,
+  col = "gray",
+  main = "",
+  xlab = "Change of methylation (Group1 - Group2)",
+  ylab = "Number of LMRs"
+)
+lmr <- lmr[abs(lmr$diff.Methy) > 0.2, ]
+lmr <- makeGRangesFromDataFrame(lmr, keep.extra.columns = T)
+lmrsel <-
+  lmr[sample(x = length(lmr),
+             size = 10000,
+             replace = FALSE)]
+bins <-
+  bin(
+    x = lmrsel$diff.Methy,
+    binmode = "equalN",
+    nElement = 800,
+    minAbsX = 0.2
+  )
+plotBinDensity(lmrsel$diff.Methy, bins, legend = "topleft")
+pwms <- getMatrixSet(JASPAR2020,
+                     opts = list(matrixtype = "PWM",
+                                 tax_group = "vertebrates"))
+lmrsel <-
+  trim(resize(lmrsel, width = median(width(lmrsel)), fix = "center"))
+#lmrseqs <- getSeq(BSgenome.Hsapiens.UCSC.hg19, lmrsel)
+
+#plotBinDiagnostics(seqs = lmrseqs,
+#                   bins = bins,
+#                   aspect = "GCfrac")
+#plotBinDiagnostics(seqs = lmrseqs,
+#                   bins = bins,
+#                   aspect = "dinucfreq")
+
+#se <- calcBinnedMotifEnrR(seqs = lmrseqs, bins = bins, pwmL = pwms)
+#saveRDS(se, "data/motif_enrichment_AEL_subgroups.RDS")
+
+se <- readRDS("data/motif_enrichment_AEL_subgroups.RDS")
+
+sel <- apply(assay(se, "negLog10Padj"), 1,
+function(x) max(abs(x), 0, na.rm = TRUE)) > 4.0
+seSel <- se[sel, ]
+plotMotifHeatmaps(x = seSel, which.plots = c("log2enr", "negLog10Padj"),
+width = 2.0, cluster = TRUE, maxEnr = 2, maxSig = 10,
+show_motif_GC = TRUE)
+
+
+```
+
