@@ -14,7 +14,7 @@
 
 <title>Visualization</title>
 
-<script src="site_libs/header-attrs-2.17/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -288,7 +288,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Visualization</h1>
 <h4 class="author">Reka_Toth</h4>
-<h4 class="date">03 February, 2023</h4>
+<h4 class="date">16 June, 2023</h4>
 
 </div>
 
@@ -317,7 +317,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-02-03
+<strong>Last updated:</strong> 2023-06-16
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -335,7 +335,7 @@ title="This is the local directory in which the code in this file was executed."
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
 analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version
-1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+1.7.0.4). The <em>Checks</em> tab describes the reproducibility checks
 that were applied when the results were created. The <em>Past
 versions</em> tab lists the development history.
 </p>
@@ -448,15 +448,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreed2e0b8f9b74afd8e0c8e602eeca7368e957040dbtargetblankd2e0b8fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreea57722af1203394b92ce0ad418a20e580f677a6dtargetblanka57722aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/tkik/AEL_methylation/tree/d2e0b8f9b74afd8e0c8e602eeca7368e957040db" target="_blank">d2e0b8f</a>
+<a href="https://github.com/tkik/AEL_methylation/tree/a57722af1203394b92ce0ad418a20e580f677a6d" target="_blank">a57722a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreed2e0b8f9b74afd8e0c8e602eeca7368e957040dbtargetblankd2e0b8fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreea57722af1203394b92ce0ad418a20e580f677a6dtargetblanka57722aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -466,7 +466,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/tkik/AEL_methylation/tree/d2e0b8f9b74afd8e0c8e602eeca7368e957040db" target="_blank">d2e0b8f</a>.
+<a href="https://github.com/tkik/AEL_methylation/tree/a57722af1203394b92ce0ad418a20e580f677a6d" target="_blank">a57722a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -483,12 +483,15 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    refdir/
 
 Untracked files:
-    Untracked:  analysis/01_read_in.Rmd
     Untracked:  analysis/3_combine_meth_ge_mofa.Rmd
+    Untracked:  analysis/DMR_report_AEL_subgroups.Rmd
+    Untracked:  analysis/DMR_report_illumina.Rmd
     Untracked:  analysis/candidate_genes.Rmd
+    Untracked:  analysis/differential_AML.Rmd
     Untracked:  analysis/enhancer_gene_pairs.Rmd
     Untracked:  analysis/epiCMIT_score.Rmd
     Untracked:  analysis/homer_all.Rmd
@@ -497,15 +500,16 @@ Untracked files:
     Untracked:  analysis/prepare_homer.Rmd
     Untracked:  analysis/test.Rmd
     Untracked:  code/dataETOC2.Rd
-    Untracked:  code/epiTOC2.R
-    Untracked:  code/homer_analysis_2023_01.bash
-    Untracked:  code/region_annotation_function.R
-    Untracked:  code/seq2gene_func.R
+    Untracked:  code/support_functions.R
+    Untracked:  data/AEL_gr1_vs._AEL_gr2_down.txt
+    Untracked:  data/AEL_gr1_vs._AEL_gr2_up.txt
+    Untracked:  data/AEL_subgroup_dmr.bedGraph
     Untracked:  data/CMP_vs._all_in_normal_down.txt
     Untracked:  data/CMP_vs._all_in_normal_up.txt
     Untracked:  data/CMP_vs._all_in_tumor_down.txt
     Untracked:  data/CMP_vs._all_in_tumor_up.txt
     Untracked:  data/DML_tests.RDS
+    Untracked:  data/GSE63409_sample_sheet.txt
     Untracked:  data/HSC_vs._all_in_normal_down.txt
     Untracked:  data/HSC_vs._all_in_normal_up.txt
     Untracked:  data/HSC_vs._all_in_tumor_down.txt
@@ -514,19 +518,28 @@ Untracked files:
     Untracked:  data/MPP_vs._all_in_normal_up.txt
     Untracked:  data/MPP_vs._all_in_tumor_down.txt
     Untracked:  data/MPP_vs._all_in_tumor_up.txt
+    Untracked:  data/bigWigs_2023/
     Untracked:  data/deseq.RDS
     Untracked:  data/dmls_single.RDS
+    Untracked:  data/dmls_single_15_06.RDS
     Untracked:  data/dmr_beds/
     Untracked:  data/dmr_beds_enhancer/
     Untracked:  data/dmr_beds_promoter/
     Untracked:  data/dmrs_single.RDS
+    Untracked:  data/dmrs_single_15_06.RDS
     Untracked:  data/gene_count_matrix.csv
+    Untracked:  data/gene_expression_mat.txt
     Untracked:  data/homer_results_merged.RDS
+    Untracked:  data/motif_enrichment_AEL_subgroups.RDS
     Untracked:  data/mutations.txt
+    Untracked:  data/ncomms9489-s3.xlsx
+    Untracked:  data/ncomms9489-s7.xlsx
     Untracked:  data/no_snps_methrix_2023.RDS
     Untracked:  data/pcbc-stemsig.p219.Rda
+    Untracked:  data/processed_rnbset_GSE63409.RDS
     Untracked:  data/raw_methrix_2023.RDS
     Untracked:  data/samples_stringtie.txt
+    Untracked:  data/stringtie/
     Untracked:  data/transcript_count_matrix.csv
     Untracked:  data/tumor_vs._all_in_normal_down.txt
     Untracked:  data/tumor_vs._all_in_normal_up.txt
@@ -554,11 +567,7 @@ Untracked files:
     Untracked:  datatumor_vs._normal_in_HSC_cells_up.txt
     Untracked:  datatumor_vs._normal_in_MPP_cells_down.txt
     Untracked:  datatumor_vs._normal_in_MPP_cells_up.txt
-    Untracked:  output/MDS.html
-    Untracked:  output/MDS_files/
-    Untracked:  output/MDS_full.html
-    Untracked:  output/MDS_full_files/
-    Untracked:  output/TFBS.pdf
+    Untracked:  omnipathr-log/
     Untracked:  output/filtered/
     Untracked:  output/filtered_MC_per_chr.tsv
     Untracked:  output/filtered_contig_lens.tsv
@@ -576,8 +585,10 @@ Untracked files:
     Untracked:  output/res_enhancer/
 
 Unstaged changes:
-    Modified:   analysis/1_read_in_RNA_seq.Rmd
     Modified:   analysis/DMR_calling.Rmd
+    Modified:   analysis/DMR_report.Rmd
+    Modified:   glimma-plots/js/meth_groups.js
+    Modified:   output/MDS.html
 
 </code></pre>
 <p>
@@ -628,6 +639,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/tkik/AEL_methylation/blob/a57722af1203394b92ce0ad418a20e580f677a6d/analysis/visualization.Rmd" target="_blank">a57722a</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-06-16
+</td>
+<td>
+wflow_publish(c("analysis/visualization.Rmd", "analysis/index.Rmd",
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/tkik/AEL_methylation/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/visualization.html" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/tkik/AEL_methylation/blob/d2e0b8f9b74afd8e0c8e602eeca7368e957040db/analysis/visualization.Rmd" target="_blank">d2e0b8f</a>
 </td>
 <td>
@@ -668,7 +713,13 @@ library(BSgenome.Hsapiens.UCSC.hg19) </code></pre>
 <h2>Open dataset</h2>
 <pre class="r"><code>meth &lt;- readRDS(file.path(&quot;data&quot;, &quot;no_snps_methrix_2023.RDS&quot;))
 meth@colData$Group[meth@colData$Group==&quot;&quot;] &lt;- &quot;Normal&quot;
-meth@colData$combined &lt;- paste0(meth@colData$Group, &quot;_&quot;, meth@colData$X)</code></pre>
+meth@colData$combined &lt;- paste0(meth@colData$Group, &quot;_&quot;, meth@colData$X)
+colnames(meth@colData)[colnames(meth@colData)==&quot;X&quot;] &lt;- &quot;Type&quot;
+#meth@colData &lt;- meth@colData[,-grep(&quot;X&quot;, colnames(meth@colData))]
+meth@colData$Cell.Type &lt;- gsub(&quot; \\(.*\\)&quot;, &quot;&quot;, meth@colData$Cell.Type)
+meth@colData$Group &lt;- as.character(meth@colData$Group)
+meth@colData$Group[meth@colData$Group==&quot;&quot;] &lt;- &quot;Normal&quot;
+  meth@colData$Cell.Type[is.na(meth@colData$Cell.Type)] &lt;- &quot;Bulk patient sample&quot;</code></pre>
 </div>
 <div id="visualization" class="section level1">
 <h1>Visualization</h1>
@@ -678,10 +729,84 @@ meth@colData$combined &lt;- paste0(meth@colData$Group, &quot;_&quot;, meth@colDa
 <pre class="r"><code>methrix::plot_coverage(m = meth, type = &quot;dens&quot;)</code></pre>
 <pre><code>The dataset is bigger than the size limit. A random subset of the object will be used that contains ~1e+06 observations.</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-2-1.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><strong>Tumor vs. normal</strong></p>
 <pre class="r"><code>methrix::plot_coverage(m = meth, type = &quot;dens&quot;, pheno = &quot;Sample.Type&quot;, perGroup = TRUE)</code></pre>
 <pre><code>The dataset is bigger than the size limit. A random subset of the object will be used that contains ~1e+06 observations.</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-3-1.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="pca" class="section level2">
 <h2>PCA</h2>
@@ -689,16 +814,164 @@ meth@colData$combined &lt;- paste0(meth@colData$Group, &quot;_&quot;, meth@colDa
 <h3>All samples</h3>
 <pre class="r"><code>mpca &lt;- methrix::methrix_pca(m = meth, top_var = 10000, n_pc = 2)</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>methrix::plot_pca(mpca, m=meth, col_anno = &quot;X&quot;, shape_anno = &quot;Group&quot;)</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-4-1.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>methrix::plot_pca(mpca, m=meth, col_anno = &quot;Type&quot;, shape_anno = &quot;Group&quot;)</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
+Past versions of unnamed-chunk-4-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-4-2.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="patients-only" class="section level3">
 <h3>Patients only</h3>
 <pre class="r"><code>subset &lt;- meth[,-grep(&quot;NORMAL&quot;, meth@colData$ID)]
 mpca &lt;- methrix::methrix_pca(m = subset, top_var = 10000, n_pc = 2)</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>methrix::plot_pca(mpca, m=subset, col_anno = &quot;X&quot;, shape_anno = &quot;Group&quot;)</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-5-1.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>methrix::plot_pca(mpca, m=subset, col_anno = &quot;Type&quot;, shape_anno = &quot;Group&quot;)</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-2">
+Past versions of unnamed-chunk-5-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-5-2.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="pca-on-promoters" class="section level3">
 <h3>PCA on promoters</h3>
@@ -711,8 +984,45 @@ promoters = build_annotations(genome = &#39;hg19&#39;, annotations = &quot;hg19_
 <pre><code>Building promoters...</code></pre>
 <pre class="r"><code>mpca &lt;- methrix::methrix_pca(m= subset, top_var = 10000, ranges = promoters, n_pc = 2, do_plot = F)
 
-methrix::plot_pca(mpca, m=subset, col_anno = &quot;X&quot;, shape_anno = &quot;Group&quot;)</code></pre>
+methrix::plot_pca(mpca, m=subset, col_anno = &quot;Type&quot;, shape_anno = &quot;Group&quot;)</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-7-1.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 <div id="heatmap" class="section level2">
@@ -721,11 +1031,85 @@ methrix::plot_pca(mpca, m=subset, col_anno = &quot;X&quot;, shape_anno = &quot;G
 <h3>All samples</h3>
 <pre class="r"><code>pheatmap::pheatmap(get_matrix(order_by_sd(meth)[1:20000,]))</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-8-1.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="patients-only-1" class="section level3">
 <h3>Patients only</h3>
 <pre class="r"><code>pheatmap::pheatmap(get_matrix(order_by_sd(subset)[1:20000,]))</code></pre>
 <p><img src="figure/visualization.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/ed6c4571ba2c3598d9e4868bd11c6e98e95f47ef/docs/figure/visualization.Rmd/unnamed-chunk-9-1.png" target="_blank">ed6c457</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -735,7 +1119,7 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.2.2 (2022-10-31 ucrt)
+<pre><code>R version 4.2.3 (2023-03-15 ucrt)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 Running under: Windows 10 x64 (build 19042)
 
@@ -755,85 +1139,86 @@ attached base packages:
 other attached packages:
  [1] org.Hs.eg.db_3.16.0                    
  [2] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2
- [3] GenomicFeatures_1.49.7                 
- [4] AnnotationDbi_1.59.1                   
- [5] annotatr_1.23.0                        
+ [3] GenomicFeatures_1.50.4                 
+ [4] AnnotationDbi_1.60.0                   
+ [5] annotatr_1.24.0                        
  [6] BSgenome.Hsapiens.UCSC.hg19_1.4.3      
- [7] BSgenome_1.66.0                        
- [8] rtracklayer_1.57.0                     
- [9] Biostrings_2.65.6                      
-[10] XVector_0.37.1                         
-[11] BiocManager_1.30.19                    
+ [7] BSgenome_1.66.3                        
+ [8] rtracklayer_1.58.0                     
+ [9] Biostrings_2.66.0                      
+[10] XVector_0.38.0                         
+[11] BiocManager_1.30.20                    
 [12] pheatmap_1.0.12                        
-[13] methrix_1.12.0                         
-[14] SummarizedExperiment_1.27.3            
-[15] Biobase_2.57.1                         
-[16] GenomicRanges_1.49.0                   
-[17] GenomeInfoDb_1.33.7                    
-[18] IRanges_2.31.2                         
-[19] S4Vectors_0.35.4                       
-[20] BiocGenerics_0.43.4                    
-[21] MatrixGenerics_1.9.1                   
-[22] matrixStats_0.62.0                     
-[23] data.table_1.14.4                      
-[24] workflowr_1.7.0                        
+[13] methrix_1.8.01                         
+[14] SummarizedExperiment_1.28.0            
+[15] Biobase_2.58.0                         
+[16] GenomicRanges_1.50.2                   
+[17] GenomeInfoDb_1.34.9                    
+[18] IRanges_2.32.0                         
+[19] S4Vectors_0.36.1                       
+[20] BiocGenerics_0.44.0                    
+[21] MatrixGenerics_1.10.0                  
+[22] matrixStats_0.63.0                     
+[23] data.table_1.14.8                      
+[24] workflowr_1.7.0.4                      
 
 loaded via a namespace (and not attached):
-  [1] AnnotationHub_3.6.0           BiocFileCache_2.6.0          
-  [3] plyr_1.8.7                    BiocParallel_1.31.12         
-  [5] ggplot2_3.3.6                 digest_0.6.29                
-  [7] htmltools_0.5.3               fansi_1.0.3                  
+  [1] AnnotationHub_3.6.0           BiocFileCache_2.6.1          
+  [3] plyr_1.8.8                    BiocParallel_1.32.5          
+  [5] ggplot2_3.4.1                 digest_0.6.29                
+  [7] htmltools_0.5.4               fansi_1.0.4                  
   [9] magrittr_2.0.3                memoise_2.0.1                
- [11] tzdb_0.3.0                    readr_2.1.3                  
- [13] prettyunits_1.1.1             colorspace_2.0-3             
+ [11] tzdb_0.3.0                    readr_2.1.4                  
+ [13] prettyunits_1.1.1             colorspace_2.1-0             
  [15] blob_1.2.3                    rappdirs_0.3.3               
- [17] xfun_0.34                     dplyr_1.0.10                 
+ [17] xfun_0.37                     dplyr_1.1.0                  
  [19] callr_3.7.3                   crayon_1.5.2                 
- [21] RCurl_1.98-1.9                jsonlite_1.8.3               
+ [21] RCurl_1.98-1.10               jsonlite_1.8.4               
  [23] glue_1.6.2                    gtable_0.3.1                 
- [25] zlibbioc_1.43.0               DelayedArray_0.23.2          
- [27] Rhdf5lib_1.19.2               HDF5Array_1.25.2             
+ [25] zlibbioc_1.44.0               DelayedArray_0.23.2          
+ [27] Rhdf5lib_1.20.0               HDF5Array_1.26.0             
  [29] scales_1.2.1                  DBI_1.1.3                    
  [31] Rcpp_1.0.9                    xtable_1.8-4                 
- [33] progress_1.2.2                bit_4.0.4                    
+ [33] progress_1.2.2                bit_4.0.5                    
  [35] httr_1.4.4                    RColorBrewer_1.1-3           
  [37] ellipsis_0.3.2                pkgconfig_2.0.3              
- [39] XML_3.99-0.12                 farver_2.1.1                 
- [41] sass_0.4.2                    dbplyr_2.2.1                 
- [43] utf8_1.2.2                    tidyselect_1.2.0             
+ [39] XML_3.99-0.13                 farver_2.1.1                 
+ [41] sass_0.4.5                    dbplyr_2.3.0                 
+ [43] utf8_1.2.3                    tidyselect_1.2.0             
  [45] labeling_0.4.2                rlang_1.0.6                  
  [47] reshape2_1.4.4                later_1.3.0                  
  [49] munsell_0.5.0                 BiocVersion_3.16.0           
- [51] tools_4.2.2                   cachem_1.0.6                 
- [53] cli_3.3.0                     generics_0.1.3               
- [55] RSQLite_2.2.18                evaluate_0.17                
- [57] stringr_1.4.1                 fastmap_1.1.0                
+ [51] tools_4.2.3                   cachem_1.0.6                 
+ [53] cli_3.6.0                     generics_0.1.3               
+ [55] RSQLite_2.3.0                 evaluate_0.20                
+ [57] stringr_1.5.0                 fastmap_1.1.0                
  [59] yaml_2.3.6                    processx_3.7.0               
- [61] knitr_1.40                    bit64_4.0.5                  
+ [61] knitr_1.42                    bit64_4.0.5                  
  [63] fs_1.5.2                      KEGGREST_1.38.0              
- [65] sparseMatrixStats_1.9.0       whisker_0.4                  
+ [65] sparseMatrixStats_1.10.0      whisker_0.4.1                
  [67] mime_0.12                     xml2_1.3.3                   
- [69] biomaRt_2.54.0                compiler_4.2.2               
+ [69] biomaRt_2.54.0                compiler_4.2.3               
  [71] rstudioapi_0.14               filelock_1.0.2               
- [73] curl_4.3.3                    png_0.1-7                    
+ [73] curl_5.0.0                    png_0.1-8                    
  [75] interactiveDisplayBase_1.36.0 tibble_3.1.8                 
- [77] bslib_0.4.1                   stringi_1.7.8                
- [79] highr_0.9                     ps_1.7.0                     
- [81] lattice_0.20-45               Matrix_1.5-1                 
- [83] vctrs_0.5.0                   pillar_1.8.1                 
- [85] lifecycle_1.0.3               rhdf5filters_1.9.0           
+ [77] bslib_0.4.2                   stringi_1.7.8                
+ [79] highr_0.10                    ps_1.7.0                     
+ [81] lattice_0.20-45               Matrix_1.5-3                 
+ [83] vctrs_0.5.2                   pillar_1.8.1                 
+ [85] lifecycle_1.0.3               rhdf5filters_1.10.0          
  [87] jquerylib_0.1.4               bitops_1.0-7                 
  [89] httpuv_1.6.6                  R6_2.5.1                     
  [91] BiocIO_1.8.0                  promises_1.2.0.1             
- [93] codetools_0.2-18              assertthat_0.2.1             
- [95] rhdf5_2.41.1                  rprojroot_2.0.3              
- [97] rjson_0.2.21                  regioneR_1.30.0              
- [99] GenomicAlignments_1.33.1      Rsamtools_2.13.4             
-[101] GenomeInfoDbData_1.2.9        parallel_4.2.2               
-[103] hms_1.1.2                     grid_4.2.2                   
-[105] rmarkdown_2.17                DelayedMatrixStats_1.20.0    
-[107] git2r_0.30.1                  getPass_0.2-2                
-[109] shiny_1.7.3                   restfulr_0.0.15              </code></pre>
+ [93] codetools_0.2-19              assertthat_0.2.1             
+ [95] rhdf5_2.42.0                  rprojroot_2.0.3              
+ [97] rjson_0.2.21                  withr_2.5.0                  
+ [99] regioneR_1.30.0               GenomicAlignments_1.34.0     
+[101] Rsamtools_2.14.0              GenomeInfoDbData_1.2.9       
+[103] parallel_4.2.3                hms_1.1.2                    
+[105] grid_4.2.3                    rmarkdown_2.20               
+[107] DelayedMatrixStats_1.20.0     git2r_0.30.1                 
+[109] getPass_0.2-2                 shiny_1.7.4                  
+[111] restfulr_0.0.15              </code></pre>
 </div>
 </div>
 </div>

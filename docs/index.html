@@ -349,15 +349,15 @@ results.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreed9a4bfe5a60e6c98e7827e00144a0bc0d1b60563targetblankd9a4bfea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreea57722af1203394b92ce0ad418a20e580f677a6dtargetblanka57722aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/tkik/AEL_methylation/tree/d9a4bfe5a60e6c98e7827e00144a0bc0d1b60563" target="_blank">d9a4bfe</a>
+<a href="https://github.com/tkik/AEL_methylation/tree/a57722af1203394b92ce0ad418a20e580f677a6d" target="_blank">a57722a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreed9a4bfe5a60e6c98e7827e00144a0bc0d1b60563targetblankd9a4bfea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomtkikAELmethylationtreea57722af1203394b92ce0ad418a20e580f677a6dtargetblanka57722aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -367,7 +367,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/tkik/AEL_methylation/tree/d9a4bfe5a60e6c98e7827e00144a0bc0d1b60563" target="_blank">d9a4bfe</a>.
+<a href="https://github.com/tkik/AEL_methylation/tree/a57722af1203394b92ce0ad418a20e580f677a6d" target="_blank">a57722a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -384,11 +384,11 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    refdir/
 
 Untracked files:
     Untracked:  analysis/3_combine_meth_ge_mofa.Rmd
+    Untracked:  analysis/DMR_report_AEL_subgroups.Rmd
     Untracked:  analysis/DMR_report_illumina.Rmd
     Untracked:  analysis/candidate_genes.Rmd
     Untracked:  analysis/differential_AML.Rmd
@@ -400,6 +400,10 @@ Untracked files:
     Untracked:  analysis/prepare_homer.Rmd
     Untracked:  analysis/test.Rmd
     Untracked:  code/dataETOC2.Rd
+    Untracked:  code/support_functions.R
+    Untracked:  data/AEL_gr1_vs._AEL_gr2_down.txt
+    Untracked:  data/AEL_gr1_vs._AEL_gr2_up.txt
+    Untracked:  data/AEL_subgroup_dmr.bedGraph
     Untracked:  data/CMP_vs._all_in_normal_down.txt
     Untracked:  data/CMP_vs._all_in_normal_up.txt
     Untracked:  data/CMP_vs._all_in_tumor_down.txt
@@ -426,6 +430,7 @@ Untracked files:
     Untracked:  data/gene_count_matrix.csv
     Untracked:  data/gene_expression_mat.txt
     Untracked:  data/homer_results_merged.RDS
+    Untracked:  data/motif_enrichment_AEL_subgroups.RDS
     Untracked:  data/mutations.txt
     Untracked:  data/ncomms9489-s3.xlsx
     Untracked:  data/ncomms9489-s7.xlsx
@@ -462,6 +467,7 @@ Untracked files:
     Untracked:  datatumor_vs._normal_in_HSC_cells_up.txt
     Untracked:  datatumor_vs._normal_in_MPP_cells_down.txt
     Untracked:  datatumor_vs._normal_in_MPP_cells_up.txt
+    Untracked:  omnipathr-log/
     Untracked:  output/filtered/
     Untracked:  output/filtered_MC_per_chr.tsv
     Untracked:  output/filtered_contig_lens.tsv
@@ -481,6 +487,8 @@ Untracked files:
 Unstaged changes:
     Modified:   analysis/DMR_calling.Rmd
     Modified:   analysis/DMR_report.Rmd
+    Modified:   glimma-plots/js/meth_groups.js
+    Modified:   output/MDS.html
 
 </code></pre>
 <p>
@@ -525,6 +533,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/tkik/AEL_methylation/blob/a57722af1203394b92ce0ad418a20e580f677a6d/analysis/index.Rmd" target="_blank">a57722a</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-06-16
+</td>
+<td>
+wflow_publish(c("analysis/visualization.Rmd", "analysis/index.Rmd",
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/tkik/AEL_methylation/aea8dba72890fd4654b9faf435202b01b9969000/docs/index.html" target="_blank">aea8dba</a>
+</td>
+<td>
+tkik
+</td>
+<td>
+2023-06-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -681,6 +723,9 @@ class="section level2">
 and annotation of DMR calling.</p>
 <p>Click on this <a href="homer_results.html">link</a> for TF motif
 analysis on DMRs.</p>
+<p>Click on this <a href="DMR_report_AEL_subgroups.html">link</a> to see
+DNR report and motif enrichment for the identified methylation
+subgroups.</p>
 <p>Click on this <a href="DMR_report_illumina.html">link</a> to see the
 DMRs’ behaviour in AML.</p>
 <p>Click on this <a href="differential_AML.html">link</a> for the
@@ -694,7 +739,8 @@ analysis on DMRs.</p>
 <div id="gene-expression-of-the-methylation-subgroups"
 class="section level2">
 <h2>Gene expression of the methylation subgroups</h2>
-<p><a href="GE_meth_groups.html">GE_meth_groups</a></p>
+<p><a href="GE_meth_groups.html">GE_meth_groups</a> - differential
+expression and master regulator analysis</p>
 <p><a href="../glimma-plots/meth_groups.html">Differential gene
 expression plots</a></p>
 <p><a href="../glimma-plots/MD-Plot.html">MD plot</a></p>
