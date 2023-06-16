@@ -39,7 +39,7 @@ Click on this [link](epiCMIT_score_comb.html) for TF motif analysis on DMRs.
 
 [GE_meth_groups](GE_meth_groups.html) - differential expression and master regulator analysis
 
-[Differential gene expression plots](../glimma-plots/meth_groups.html)
+[Differential gene expression plots](glimma-plots/meth_groups.html)
 
-[MD plot](../glimma-plots/MD-Plot.html)
+[MD plot](glimma-plots/MD-Plot.html)
 
