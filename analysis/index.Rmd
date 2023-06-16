@@ -1,5 +1,5 @@
 ---
-title: "scMeth_HSC"
+title: "AEL methylation"
 site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
